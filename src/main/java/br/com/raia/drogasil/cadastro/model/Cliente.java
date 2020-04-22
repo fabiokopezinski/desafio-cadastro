@@ -1,6 +1,6 @@
 package br.com.raia.drogasil.cadastro.model;
 
-import java.util.Date;
+import java.util.Calendar;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,8 +13,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -42,9 +40,8 @@ public class Cliente {
 	private SexoEnum sexo;
 	private Integer idade;
 	@NotNull(message = "Informe sua data de nascimento")
-	@JsonFormat(pattern = "dd/MM/YYYY")
-	@Temporal(TemporalType.DATE)
-	private Date dataNascimento;
+	@JsonFormat(pattern = "dd/MM/yyyy")
+	private Calendar dataNascimento;
 	@ManyToOne
 	@JoinColumn(name = "cidade_id")
 	@NotNull(message = "Por favor, inserir um endereço")

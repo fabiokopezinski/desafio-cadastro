@@ -17,7 +17,7 @@ public class ClienteDto {
 	private String sobrenome;
 	private SexoEnum sexo;
 	private Integer idade;
-	@JsonFormat(pattern="dd/MM/yyyy")
+	@JsonFormat(pattern = "dd/MM/yyyy")
 	private Date dataNascimento;
 	private CidadeDto cidade;
 

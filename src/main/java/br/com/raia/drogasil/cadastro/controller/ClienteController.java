@@ -16,68 +16,125 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.raia.drogasil.cadastro.config.validacao.ErroDeFormularioDto;
+import br.com.raia.drogasil.cadastro.config.validacao.ErrorResponse;
 import br.com.raia.drogasil.cadastro.converter.ClienteConverter;
+import br.com.raia.drogasil.cadastro.dto.CidadeDto;
 import br.com.raia.drogasil.cadastro.dto.ClienteDto;
 import br.com.raia.drogasil.cadastro.form.ClienteAtualizarForm;
 import br.com.raia.drogasil.cadastro.form.ClienteForm;
 import br.com.raia.drogasil.cadastro.service.ClienteService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 @RestController
 @RequestMapping("/cliente")
 public class ClienteController {
-	
+
 	@Autowired
 	private ClienteService clienteService;
-	
+
 	@Autowired
 	private ClienteConverter clienteConverter;
-	
+
+	@Operation(summary = "Listar clientes", description = "Listagem de clientes")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "Lista de clientes", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ClienteDto.class))))
+
+	})
 	@GetMapping
-	public List<ClienteDto> listarClientes()
-	{
+	public List<ClienteDto> listarClientes() {
 		return clienteConverter.toArray(clienteService.listarClientes());
 	}
-	
+
+	@Operation(summary = "Buscar cliente por ID", description = "Faz uma buscar por um cliente pelo ID")
+	@ApiResponses(value = {
+
+			@ApiResponse(responseCode = "200", description = "Cliente encontrado",
+
+					content = @Content(schema = @Schema(implementation = ClienteDto.class))),
+
+			@ApiResponse(responseCode = "404", description = "Cliente não encontrado") })
+
 	@GetMapping("/{id}")
-	public ClienteDto buscarPorId(@PathVariable Integer id)
-	{
+	public ClienteDto buscarPorId(@PathVariable Integer id) {
 		return clienteConverter.toEntity(clienteService.buscarPorId(id));
 	}
-	
+
+	@Operation(summary = "Buscar cliente por nome completo", description = "Faz uma busca pelo nome completo")
+	@ApiResponses(value = {
+
+			@ApiResponse(responseCode = "200", description = "Cliente encontrado",
+
+					content = @Content(schema = @Schema(implementation = ClienteDto.class))),
+
+			@ApiResponse(responseCode = "404", description = "Cliente não encontrado") })
 	@GetMapping("/nome/completo")
-	public ClienteDto buscarPorNomeCompleto(@RequestParam("nome") String nome,@RequestParam("sobrenome") String sobrenome)
-	{
+	public ClienteDto buscarPorNomeCompleto(@RequestParam("nome") String nome,
+			@RequestParam("sobrenome") String sobrenome) {
 		return clienteConverter.toEntity(clienteService.buscarNomeESobrenome(nome, sobrenome));
 	}
-	
+
+	@Operation(summary = "Buscar clientes pelo nome", description = "Faz uma busca por clientes pelo mesmo nome")
+	@ApiResponses(value = {
+
+			@ApiResponse(responseCode = "200", description = "Clientes encontrados",
+
+					content = @Content(schema = @Schema(implementation = ClienteDto.class))),
+
+			@ApiResponse(responseCode = "404", description = "Clientes não encontrados") })
 	@GetMapping("/nome")
-	public List<ClienteDto> buscarPorNome(@RequestParam("nome") String nome)
-	{
+	public List<ClienteDto> buscarPorNome(@RequestParam("nome") String nome) {
 		return clienteConverter.toArray(clienteService.buscarPorNome(nome));
 	}
-	
+
+	@Operation(summary = "Atualizar dados do cliente", description = "Atualiza o nome do cliente")
+	@ApiResponses(value = {
+
+			@ApiResponse(responseCode = "200", description = "Cliente Atualizado",
+
+					content = @Content(schema = @Schema(implementation = ClienteDto.class))),
+			@ApiResponse(responseCode = "400", description = "Algum parâmetro não foi informado", content = @Content(schema = @Schema(implementation = ErroDeFormularioDto.class))),
+
+			@ApiResponse(responseCode = "500", description = "Cliente não encontrado", content = @Content(schema = @Schema(implementation = ErrorResponse.class))) })
 	@PutMapping("/atualizar")
 	@Transactional
-	public ClienteDto atualizarCliente(@RequestBody @Valid ClienteAtualizarForm atualizarForm)
-	{
+	public ClienteDto atualizarCliente(@RequestBody @Valid ClienteAtualizarForm atualizarForm) {
 		return clienteConverter.toOutPut(clienteService.atualizarCliente(clienteConverter.toEntity(atualizarForm)));
 	}
-	
-	
+
+	@Operation(summary = "Cadastro novo cliente", description = "Realiza um novo cadastro de algum cliente. Por favor, colocar a data de nascimento com o formato dd/mm/yyyy")
+	@ApiResponses(value = {
+
+			@ApiResponse(responseCode = "200", description = "Cliente cadastrado",
+
+					content = @Content(schema = @Schema(implementation = ClienteDto.class))),
+			@ApiResponse(responseCode = "400", description = "Algum parâmetro não foi informado", content = @Content(schema = @Schema(implementation = ErroDeFormularioDto.class))),
+
+			@ApiResponse(responseCode = "500", description = "Cliente já foi cadastrado", content = @Content(schema = @Schema(implementation = ErrorResponse.class))) })
+
 	@PostMapping
 	@Transactional
-	public ClienteDto cadastrar(@RequestBody @Valid ClienteForm clienteForm)
-	{
+	public ClienteDto cadastrar(@RequestBody @Valid ClienteForm clienteForm) {
 		return clienteConverter.toOutPut(clienteService.cadastrar(clienteConverter.toEntity(clienteForm)));
 	}
-	
-	@DeleteMapping("/deletar") 
+
+	@Operation(summary = "Deletar cliente", description = "Apagar um cliente do banco de dados")
+	@ApiResponses(value = {
+
+			@ApiResponse(responseCode = "200", description = "Cliente deletad0 com sucesso",
+
+					content = @Content(schema = @Schema(implementation = CidadeDto.class))),
+
+			@ApiResponse(responseCode = "404", description = "Não foi encontrada nenhuma cliente com essa nome") })
+	@DeleteMapping("/deletar")
 	@Transactional
-	public String deletarCliente(@RequestParam("nome") String nome,@RequestParam("sobrenome") String sobrenome)
-	{
-		return clienteService.deletar(nome,sobrenome);
+	public String deletarCliente(@RequestParam("nome") String nome, @RequestParam("sobrenome") String sobrenome) {
+		return clienteService.deletar(nome, sobrenome);
 	}
-	
-	
 
 }

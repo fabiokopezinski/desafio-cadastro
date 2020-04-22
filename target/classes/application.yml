@@ -1,8 +1,11 @@
 ## PostgreSQL
 spring:  datasource:
-    initialization-mode: always    url: jdbc:postgresql://localhost:5432/cadastros 
+    initialization-mode: never 
+    url: jdbc:postgresql://localhost:5432/cadastros 
     username: postgres
     password: 124578  jpa:
     hibernate:     ddl-auto: none    show-sql: false
 
-#drop n create table again, good for testing, comment this in production
+### Swagger
+
+springdoc:  swagger-ui:    path: /swagger-ui.html

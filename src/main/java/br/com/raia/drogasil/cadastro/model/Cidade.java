@@ -25,20 +25,20 @@ import lombok.ToString;
 @Entity
 @ToString(exclude = { "cliente" })
 @Table(name = "CIDADE")
-@SequenceGenerator(name="CIDADE", sequenceName="cidade_seq_id",
-initialValue=1, allocationSize=1)
+
 public class Cidade {
 
 	@Id
-	@Column(nullable = false)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "cidade_seq_id")
+	@Column(name = "id", nullable = false, updatable = false)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cidade_seq_id")
+	@SequenceGenerator(name = "CIDADE", sequenceName = "cidade_seq_id", allocationSize = 1)
 	private Integer id;
 	@NotBlank
 	@Column(unique = true)
 	private String nome;
 	@NotBlank
 	private String estado;
-	
+
 	@OneToMany(mappedBy = "cidade")
 	private List<Cliente> cliente;
 }

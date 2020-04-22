@@ -17,39 +17,35 @@ public class CidadeService {
 	@Autowired
 	private CidadeRepository cidadeRepository;
 
-	public List<Cidade> listarEstados() {
+	public List<Cidade> listaDeCidades() {
 		return cidadeRepository.findAll();
 	}
 
 	public List<Cidade> buscarPorEstado(String estado) {
 
-		boolean present = cidadeRepository.findByEstado(estado).stream().findFirst().isPresent();
-		if (present) {
-			return cidadeRepository.findByEstado(estado);
+		List<Cidade> estadoAchado = cidadeRepository.findByEstado(estado.toUpperCase());
+		if (estadoAchado.isEmpty()) {
+			throw new ResourceNotFoundException("Não achou nenhum estado");
 		}
-		throw new ResourceNotFoundException("Não achou nenhum estado");
+		return estadoAchado;
+
 	}
 
-	public Optional<Cidade> buscarPorNome(String nome) {
+	public Cidade buscarPorCidade(String nome) {
 
-		Optional<Cidade> nomeDaCidade = cidadeRepository.findByNome(nome);
+		Optional<Cidade> nomeDaCidade = cidadeRepository.findByNome(nome.toUpperCase());
 		if (nomeDaCidade.isPresent()) {
-			return nomeDaCidade;
+			return nomeDaCidade.get();
 		}
 		throw new ResourceNotFoundException("Nome da cidade não encontrada");
 
 	}
 
-	public Optional<Cidade> buscarId(Integer id) {
-		Optional<Cidade> cidadeId = cidadeRepository.findById(id);
-		if (cidadeId.isPresent()) {
-			return cidadeId;
-		}
-
-		throw new ResourceNotFoundException("Não achou o Id encontrado");
-	}
-
 	public Cidade cadastrar(Cidade cidade) {
+		String nome = cidade.getNome();
+		String estado = cidade.getEstado();
+		cidade.setNome(nome.toUpperCase());
+		cidade.setEstado(estado.toUpperCase());
 		Optional<Cidade> cidadeNome = cidadeRepository.findByNome(cidade.getNome());
 		if (cidadeNome.isEmpty()) {
 

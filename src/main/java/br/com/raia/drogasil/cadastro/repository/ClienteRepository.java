@@ -11,7 +11,7 @@ import br.com.raia.drogasil.cadastro.model.Cliente;
 @Repository
 public interface ClienteRepository extends JpaRepository<Cliente, Integer> {
 
-	Optional<Cliente> findByNomeAndSobrenome(String nome,String sobreNome);
-	
+	Optional<Cliente> findByNomeAndSobrenome(String nome, String sobreNome);
+
 	List<Cliente> findByNome(String nome);
 }
