@@ -18,8 +18,6 @@ public class ClienteService {
 	@Autowired
 	private ClienteRepository clienteRepository;
 
-	private Cliente novoCliente = new Cliente();
-
 	@Autowired
 	private CidadeService cidadeService;
 
@@ -32,16 +30,20 @@ public class ClienteService {
 				.orElseThrow(() -> new ResourceNotFoundException("Cliente não foi encontrado"));
 	}
 
-	public Cliente buscarPorNome(String nome) {
-		Optional<Cliente> nomeCliente=clienteRepository.findByNome(nome);
-		System.out.println(nomeCliente.get().getCidade().getEstado());
-		if (nomeCliente.isPresent()) {
-			return nomeCliente.get();
+	public List<Cliente> buscarPorNome(String nome) {
+		boolean present = clienteRepository.findByNome(nome).stream().findFirst().isPresent();
+		if(present)
+		{
+			return clienteRepository.findByNome(nome);
 		}
-		throw new ResourceNotFoundException("Não achou nenhum nomes");
+		throw new ResourceNotFoundException("Clientes com esse nome não foram encontrados");
 	}
 
 	public Cliente cadastrar(Cliente cliente) {
+		String nome=cliente.getNome().toUpperCase();
+		String sobrenome= cliente.getSobrenome().toUpperCase();
+		cliente.setNome(nome);
+		cliente.setSobrenome(sobrenome);
 		Optional<Cliente> nomeCompleto = clienteRepository.findByNomeAndSobrenome(cliente.getNome(),
 				cliente.getSobrenome());
 		cliente.setCidade(carregarCidade(cliente.getCidade()));
@@ -55,10 +57,14 @@ public class ClienteService {
 
 	}
 
-	public Cliente atualizarCliente(Cliente cliente, Integer id) {
-		boolean present = clienteRepository.findById(id).isPresent();
+	public Cliente atualizarCliente(Cliente cliente) {
+		Cliente novoCliente = clienteRepository.getOne(cliente.getId());
+		boolean present = clienteRepository.findById(cliente.getId()).isPresent();
+		String nome=cliente.getNome().toUpperCase();
+		String sobrenome= cliente.getSobrenome().toUpperCase();
+		cliente.setNome(nome);
+		cliente.setSobrenome(sobrenome);
 		if (present) {
-			novoCliente = clienteRepository.getOne(id);
 			novoCliente.setNome(cliente.getNome());
 			novoCliente.setSobrenome(cliente.getSobrenome());
 
@@ -76,8 +82,6 @@ public class ClienteService {
 
 	public Optional<Cliente> buscarPorId(Integer id) {
 		Optional<Cliente> clienteId = clienteRepository.findById(id);
-		System.out.println(clienteId.isPresent());
-		System.out.println(clienteId.get().getNome());
 		if(clienteId.isPresent())
 		{
 			return clienteId;
@@ -85,13 +89,14 @@ public class ClienteService {
 		throw new ResourceNotFoundException("Não achou");
 	}
 	
-	public String deletar(Integer id)
+	public String deletar(String nome,String sobrenome)
 	{
-		Optional<Cliente> deletarCliente=clienteRepository.findById(id);
+		
+		Optional<Cliente> deletarCliente=clienteRepository.findByNomeAndSobrenome(nome.toUpperCase(), sobrenome.toUpperCase());
 		if(deletarCliente.isPresent())
 		{
 			clienteRepository.deleteById(deletarCliente.get().getId());
-			return "Deletada com sucesso";
+			return "Deletado com sucesso";
 		}
 		throw new ResourceNotFoundException("Não foi encontrado");
 		

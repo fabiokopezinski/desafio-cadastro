@@ -38,10 +38,6 @@ public class Cidade {
 	private String nome;
 	@NotBlank
 	private String estado;
-
-//	@ManyToOne
-//	@JoinColumn(name="cliente_id")
-//	private Cliente cliente;
 	
 	@OneToMany(mappedBy = "cidade")
 	private List<Cliente> cliente;

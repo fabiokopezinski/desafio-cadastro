@@ -7,7 +7,7 @@ import lombok.Setter;
 @Setter
 public class ClienteAtualizarForm {
 
-	
+	private Integer id;
 	private String nome;
 	private String sobrenome;
 }

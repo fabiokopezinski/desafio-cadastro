@@ -44,17 +44,23 @@ public class ClienteController {
 		return clienteConverter.toEntity(clienteService.buscarPorId(id));
 	}
 	
-	@GetMapping("/nome/{nome} {sobrenome}")
-	public ClienteDto buscarPorNomeCompleto(@RequestParam String nome,@PathVariable String sobrenome)
+	@GetMapping("/nome/completo")
+	public ClienteDto buscarPorNomeCompleto(@RequestParam("nome") String nome,@RequestParam("sobrenome") String sobrenome)
 	{
 		return clienteConverter.toEntity(clienteService.buscarNomeESobrenome(nome, sobrenome));
 	}
 	
-	@PutMapping("/{id}")
-	@Transactional
-	public ClienteDto atualizarPorId(@PathVariable Integer id, @RequestBody @Valid ClienteAtualizarForm atualizarForm)
+	@GetMapping("/nome")
+	public List<ClienteDto> buscarPorNome(@RequestParam("nome") String nome)
 	{
-		return clienteConverter.toOutPut(clienteService.atualizarCliente(clienteConverter.toEntity(atualizarForm),id));
+		return clienteConverter.toArray(clienteService.buscarPorNome(nome));
+	}
+	
+	@PutMapping("/atualizar")
+	@Transactional
+	public ClienteDto atualizarCliente(@RequestBody @Valid ClienteAtualizarForm atualizarForm)
+	{
+		return clienteConverter.toOutPut(clienteService.atualizarCliente(clienteConverter.toEntity(atualizarForm)));
 	}
 	
 	
@@ -65,11 +71,11 @@ public class ClienteController {
 		return clienteConverter.toOutPut(clienteService.cadastrar(clienteConverter.toEntity(clienteForm)));
 	}
 	
-	@DeleteMapping("/{id}")
+	@DeleteMapping("/deletar") 
 	@Transactional
-	public String deletarCliente(@PathVariable Integer id)
+	public String deletarCliente(@RequestParam("nome") String nome,@RequestParam("sobrenome") String sobrenome)
 	{
-		return clienteService.deletar(id);
+		return clienteService.deletar(nome,sobrenome);
 	}
 	
 	
