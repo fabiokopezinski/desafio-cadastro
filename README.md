@@ -19,11 +19,16 @@ Crie uma solução de backend para ser executada em nuvem que proveja as seguint
  
   + Cliente
   + Cidade
+
+
+# Porcentagem de cobertura de testes
+  ![](jacaco.png)
   
 # Ferramentas 
   +  Java
   + Spring boot
   + PostgreSQL 
+  + Jacoco
 
 # Executando o projeto
   + [Heroku](https://aw-cadastros-api.herokuapp.com/swagger-ui/index.html?configUrl=/v3/api-docs/swagger-config)
