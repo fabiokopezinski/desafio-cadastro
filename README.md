@@ -26,8 +26,6 @@ Crie uma solução de backend para ser executada em nuvem que proveja as seguint
   + PostgreSQL 
 
 # Executando o projeto
-  + Executar o projeto 
-  + Após acessar [localhost:8080](http://localhost:8080)
-  + Documentação foi feita pelo Swagger [Swagger](http://localhost:8080/swagger-ui.html)
+  + [Heroku](https://aw-cadastros-api.herokuapp.com/swagger-ui/index.html?configUrl=/v3/api-docs/swagger-config)
   
 
