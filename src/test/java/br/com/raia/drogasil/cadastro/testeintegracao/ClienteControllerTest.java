@@ -34,7 +34,7 @@ import br.com.raia.drogasil.cadastro.repository.ClienteRepository;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-public class ClienteControllerTest {
+public class ClienteControllerTest { 
 
 	@Autowired
 	private MockMvc mockMvc;
