@@ -20,10 +20,10 @@ public class ClienteService {
 	private ClienteRepository clienteRepository;
 
 	@Autowired
-	private CidadeService cidadeService;
+	private CidadeService cidadeService; 
 
 	public List<Cliente> listarClientes() {
-		return clienteRepository.findAll();
+		return clienteRepository.findAll(); 
 	}
 
 	public Cliente buscarNomeESobrenome(String nome, String sobreNome) {
@@ -36,7 +36,7 @@ public class ClienteService {
 		if (clientes.isEmpty()) {
 			throw new ResourceNotFoundException("Clientes com esse nome não foram encontrados");
 		}
-		return clientes;
+		return clientes; 
 
 	}
 
@@ -69,12 +69,12 @@ public class ClienteService {
 		boolean present = clienteRepository.findById(cliente.getId()).isPresent();
 		String nome = cliente.getNome().toUpperCase();
 		String sobrenome = cliente.getSobrenome().toUpperCase();
-		Boolean verificar = buscarPorNome(nome.toUpperCase()).isEmpty();
+		 Cliente buscarNomeESobrenome = buscarNomeESobrenome(nome.toUpperCase(),sobrenome.toUpperCase());
 		cliente.setNome(nome);
 		cliente.setSobrenome(sobrenome);
-		if (present && verificar) {
+		if (present && buscarNomeESobrenome==null) {
 			novoCliente.setNome(cliente.getNome());
-			novoCliente.setSobrenome(cliente.getSobrenome());
+			novoCliente.setSobrenome(cliente.getSobrenome()); 
 
 			return novoCliente;
 		}
@@ -86,7 +86,7 @@ public class ClienteService {
 		if (clienteId.isPresent()) {
 			return clienteId.get();
 		}
-		throw new ResourceNotFoundException("Não achou");
+		throw new ResourceNotFoundException("Não achou");  
 	}
 
 	public String deletar(String nome, String sobrenome) {

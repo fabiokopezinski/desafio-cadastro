@@ -23,7 +23,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@ToString(exclude = { "cliente" })
+@ToString(exclude = { "cliente" }) 
 @Table(name = "CIDADE")
 
 public class Cidade {

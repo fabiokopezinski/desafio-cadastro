@@ -82,7 +82,7 @@ public class CidadeController {
 					content = @Content(schema = @Schema(implementation = CidadeForm.class))),
 			@ApiResponse(responseCode = "400", description = "Algum parâmetro não foi informado", content = @Content(schema = @Schema(implementation = ErroDeFormularioDto.class))),
 
-			@ApiResponse(responseCode = "500", description = "Cidade já encontrada", content = @Content(schema = @Schema(implementation = ErrorResponse.class))) })
+			@ApiResponse(responseCode = "500", description = "Cidade já cadastrada", content = @Content(schema = @Schema(implementation = ErrorResponse.class))) })
 	@PostMapping
 	@Transactional
 	public CidadeDto cadastrarCidade(@RequestBody @Valid CidadeForm cidadeForm) {

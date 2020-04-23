@@ -18,7 +18,7 @@ public class CidadeService {
 	private CidadeRepository cidadeRepository;
 
 	public List<Cidade> listaDeCidades() {
-		return cidadeRepository.findAll();
+		return cidadeRepository.findAll();  
 	}
 
 	public List<Cidade> buscarPorEstado(String estado) {
@@ -31,7 +31,7 @@ public class CidadeService {
 
 	}
 
-	public Cidade buscarPorCidade(String nome) {
+	public Cidade buscarPorCidade(String nome) { 
 
 		Optional<Cidade> nomeDaCidade = cidadeRepository.findByNome(nome.toUpperCase());
 		if (nomeDaCidade.isPresent()) {
@@ -52,16 +52,16 @@ public class CidadeService {
 			return cidadeRepository.save(cidade);
 		}
 
-		throw new BusinessException("Já foi cadastrado");
+		throw new BusinessException("Ja foi cadastrado");
 
 	}
 
 	public String deletar(String nome) {
 
-		Optional<Cidade> deletarCidade = cidadeRepository.findByNome(nome);
+		Optional<Cidade> deletarCidade = cidadeRepository.findByNome(nome); 
 		if (deletarCidade.isPresent()) {
 			cidadeRepository.deleteById(deletarCidade.get().getId());
-			return "Deletada com sucesso";
+			return "Deletada com sucesso"; 
 		}
 		throw new ResourceNotFoundException("Não foi encontrado");
 
