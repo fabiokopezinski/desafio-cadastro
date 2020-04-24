@@ -28,7 +28,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 @RestController
-@RequestMapping("/cidade")
+@RequestMapping("/cidades")
 public class CidadeController {
 
 	@Autowired
@@ -97,7 +97,7 @@ public class CidadeController {
 					content = @Content(schema = @Schema(implementation = CidadeDto.class))),
 
 			@ApiResponse(responseCode = "404", description = "Não foi encontrada nenhuma cidade com essa nome") })
-	@DeleteMapping("/deletar")
+	@DeleteMapping
 	@Transactional
 	public String deletarCidade(@RequestParam("nome") String nome) {
 

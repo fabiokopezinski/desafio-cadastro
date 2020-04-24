@@ -1,7 +1,7 @@
 package br.com.raia.drogasil.cadastro.service;
 
 import java.time.LocalDate;
-import java.util.Calendar;
+import java.time.Period;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,10 +20,10 @@ public class ClienteService {
 	private ClienteRepository clienteRepository;
 
 	@Autowired
-	private CidadeService cidadeService; 
+	private CidadeService cidadeService;
 
 	public List<Cliente> listarClientes() {
-		return clienteRepository.findAll(); 
+		return clienteRepository.findAll();
 	}
 
 	public Cliente buscarNomeESobrenome(String nome, String sobreNome) {
@@ -36,46 +36,46 @@ public class ClienteService {
 		if (clientes.isEmpty()) {
 			throw new ResourceNotFoundException("Clientes com esse nome não foram encontrados");
 		}
-		return clientes; 
+		return clientes;
 
 	}
 
 	public Cliente cadastrar(Cliente cliente) {
-		String nome = cliente.getNome().toUpperCase();
-		String sobrenome = cliente.getSobrenome().toUpperCase();
-		cliente.setNome(nome);
-		cliente.setSobrenome(sobrenome);
-
-		Optional<Cliente> nomeCompleto = clienteRepository.findByNomeAndSobrenome(cliente.getNome(),
+		Optional<Cliente> acharNome = clienteRepository.findByNomeAndSobrenome(cliente.getNome(),
 				cliente.getSobrenome());
-		cliente.setCidade(cidadeService.buscarPorCidade(cliente.getCidade().getNome().toUpperCase()));
-
-		Integer anos = LocalDate.now().getYear() - cliente.getDataNascimento().get(Calendar.YEAR);
-
-		if (!cliente.getIdade().equals(anos)) {
-
-			throw new BusinessException("Por favor, digite a idade certa ou a data de nascimento correto");
-		} else if (nomeCompleto.isPresent()) {
-
-			throw new BusinessException("Cliente já foi cadastrado");
+		if (acharNome.isEmpty()) {
+			String nome = cliente.getNome().toUpperCase();
+			String sobrenome = cliente.getSobrenome().toUpperCase();
+			cliente.setNome(nome);
+			cliente.setSobrenome(sobrenome);
+			cliente.setCidade(cidadeService.buscarPorCidade(cliente.getCidade().getNome().toUpperCase()));
+			cliente.setIdade(calcularIdade(cliente.getDataNascimento()));
+			return clienteRepository.save(cliente);
 
 		} else {
-			return clienteRepository.save(cliente);
+
+			throw new BusinessException("Cliente já foi cadastrado");
 		}
 	}
 
+	private Integer calcularIdade(LocalDate dataNascimento) {
+		LocalDate hoje = LocalDate.now();
+		Period idade = dataNascimento.until(hoje);
+		return idade.getYears();
+	}
+
 	public Cliente atualizarCliente(Cliente cliente) {
-		Cliente novoCliente = clienteRepository.getOne(cliente.getId());
-		boolean present = clienteRepository.findById(cliente.getId()).isPresent();
+		
+		boolean present = clienteRepository.findById(cliente.getId()).isPresent(); 
 		String nome = cliente.getNome().toUpperCase();
 		String sobrenome = cliente.getSobrenome().toUpperCase();
-		 Cliente buscarNomeESobrenome = buscarNomeESobrenome(nome.toUpperCase(),sobrenome.toUpperCase());
-		cliente.setNome(nome);
-		cliente.setSobrenome(sobrenome);
-		if (present && buscarNomeESobrenome==null) {
+		Cliente buscarNomeESobrenome = buscarNomeESobrenome(nome.toUpperCase(), sobrenome.toUpperCase());
+		if (present && buscarNomeESobrenome == null) { 
+			cliente.setNome(nome);
+			cliente.setSobrenome(sobrenome);
+			Cliente novoCliente = clienteRepository.getOne(cliente.getId());
 			novoCliente.setNome(cliente.getNome());
-			novoCliente.setSobrenome(cliente.getSobrenome()); 
-
+			novoCliente.setSobrenome(cliente.getSobrenome());
 			return novoCliente;
 		}
 		throw new ResourceNotFoundException("Cliente, já existe alguém com esse nome");
@@ -86,7 +86,7 @@ public class ClienteService {
 		if (clienteId.isPresent()) {
 			return clienteId.get();
 		}
-		throw new ResourceNotFoundException("Não achou");  
+		throw new ResourceNotFoundException("Não achou");
 	}
 
 	public String deletar(String nome, String sobrenome) {

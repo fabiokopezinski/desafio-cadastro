@@ -3,8 +3,8 @@ package br.com.raia.drogasil.cadastro.testeunitario.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,7 +38,7 @@ public class ClienteServiceTest {
 	@Autowired
 	private CidadeRepository cidadeRepository;
 
-	@Autowired
+	@Autowired 
 	private ClienteService clienteService;
 
 	@Rule 
@@ -59,10 +59,7 @@ public class ClienteServiceTest {
 		portoAlegre.setEstado("RIO GRANDE DO SUL");
 		this.cidadeRepository.save(portoAlegre);
 
-		Calendar dataNascimento = Calendar.getInstance();
-		dataNascimento.set(Calendar.YEAR, 1993);
-		dataNascimento.set(Calendar.MONTH, 10);
-		dataNascimento.set(Calendar.DAY_OF_MONTH, 21);
+		LocalDate dataNascimento=LocalDate.of(1993, 10, 21);
 		fabio = new Cliente();
 		fabio.setCidade(portoAlegre);
 		fabio.setDataNascimento(dataNascimento);

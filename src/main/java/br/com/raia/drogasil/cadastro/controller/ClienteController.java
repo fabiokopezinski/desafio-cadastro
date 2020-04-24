@@ -32,8 +32,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 @RestController
-@RequestMapping("/cliente")
-public class ClienteController {
+@RequestMapping("/clientes")
+public class ClienteController { 
 
 	@Autowired
 	private ClienteService clienteService;
@@ -45,7 +45,7 @@ public class ClienteController {
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200", description = "Lista de clientes", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ClienteDto.class))))
 
-	})
+	}) 
 	@GetMapping
 	public List<ClienteDto> listarClientes() {
 		return clienteConverter.toArray(clienteService.listarClientes());
@@ -73,7 +73,7 @@ public class ClienteController {
 					content = @Content(schema = @Schema(implementation = ClienteDto.class))),
 
 			@ApiResponse(responseCode = "404", description = "Cliente não encontrado") })
-	@GetMapping("/nome/completo")
+	@GetMapping("/nomecompleto")
 	public ClienteDto buscarPorNomeCompleto(@RequestParam("nome") String nome,
 			@RequestParam("sobrenome") String sobrenome) {
 		return clienteConverter.toEntity(clienteService.buscarNomeESobrenome(nome, sobrenome));
@@ -101,13 +101,13 @@ public class ClienteController {
 			@ApiResponse(responseCode = "400", description = "Algum parâmetro não foi informado", content = @Content(schema = @Schema(implementation = ErroDeFormularioDto.class))),
 
 			@ApiResponse(responseCode = "500", description = "Cliente não encontrado", content = @Content(schema = @Schema(implementation = ErrorResponse.class))) })
-	@PutMapping("/atualizar")
+	@PutMapping
 	@Transactional
 	public ClienteDto atualizarCliente(@RequestBody @Valid ClienteAtualizarForm atualizarForm) {
 		return clienteConverter.toOutPut(clienteService.atualizarCliente(clienteConverter.toEntity(atualizarForm)));
 	}
-
-	@Operation(summary = "Cadastro novo cliente", description = "Realiza um novo cadastro de algum cliente. Por favor, colocar a data de nascimento com o formato dd/mm/yyyy")
+	
+	@Operation(summary = "Cadastro novo cliente", description = "Realiza um novo cadastro de algum cliente")
 	@ApiResponses(value = {
 
 			@ApiResponse(responseCode = "200", description = "Cliente cadastrado",
@@ -131,7 +131,7 @@ public class ClienteController {
 					content = @Content(schema = @Schema(implementation = CidadeDto.class))),
 
 			@ApiResponse(responseCode = "404", description = "Não foi encontrada nenhuma cliente com essa nome") })
-	@DeleteMapping("/deletar")
+	@DeleteMapping
 	@Transactional
 	public String deletarCliente(@RequestParam("nome") String nome, @RequestParam("sobrenome") String sobrenome) {
 		return clienteService.deletar(nome, sobrenome);

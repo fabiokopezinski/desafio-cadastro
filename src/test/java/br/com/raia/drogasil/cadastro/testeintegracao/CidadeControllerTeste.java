@@ -67,7 +67,7 @@ public class CidadeControllerTeste {
 		cidadeForm = new CidadeForm();
 		cidadeForm.setEstado("Floripa");
 		cidadeForm.setNome("Floripa");
-
+ 
 		cidadeErro = new CidadeForm();
 		cidadeErro.setNome("");
 		cidadeErro.setEstado("");
@@ -84,7 +84,7 @@ public class CidadeControllerTeste {
 
 	@Test
 	public void listarTodos() throws Exception {
-		mockMvc.perform(get("/cidade").accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
+		mockMvc.perform(get("/cidades").accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
 				.andExpect(jsonPath("$.[0].nome").value(canoas.getNome()))
 				.andExpect(jsonPath("$.[0].estado").value(canoas.getEstado()))
 				.andExpect(jsonPath("$.[1].nome").value(portoAlegre.getNome()))
@@ -94,26 +94,26 @@ public class CidadeControllerTeste {
 
 	@Test
 	public void buscarPorCidadeSucesso() throws Exception {
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/cidade/nome").param("nome", canoas.getNome()))
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/cidades/nome").param("nome", canoas.getNome()))
 				.andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 	}
 
 	@Test
 	public void buscarPorCidadeError() throws Exception {
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/cidade/nome").param("nome", "C"))
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/cidades/nome").param("nome", "C"))
 				.andExpect(MockMvcResultMatchers.status().isNotFound()).andReturn();
 	}
 
 	@Test
 	public void cadastrarUmCidadeComSucesso() throws JsonProcessingException, Exception {
-		mockMvc.perform(MockMvcRequestBuilders.post("/cidade").content(objectMapper.writeValueAsBytes(cidadeForm))
+		mockMvc.perform(MockMvcRequestBuilders.post("/cidades").content(objectMapper.writeValueAsBytes(cidadeForm))
 				.accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON))
 				.andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 	}
 
 	@Test
 	public void cadastrarUmCidadeErro() throws JsonProcessingException, Exception {
-		mockMvc.perform(MockMvcRequestBuilders.post("/cidade").content(objectMapper.writeValueAsBytes(cidadeErro))
+		mockMvc.perform(MockMvcRequestBuilders.post("/cidades").content(objectMapper.writeValueAsBytes(cidadeErro))
 				.accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON))
 				.andExpect(MockMvcResultMatchers.status().isBadRequest()).andReturn();
 	}
@@ -121,14 +121,14 @@ public class CidadeControllerTeste {
 	@Test
 	public void cadastrarUmCidadeJaCadastrado() throws JsonProcessingException, Exception {
 		mockMvc.perform(
-				MockMvcRequestBuilders.post("/cidade").content(objectMapper.writeValueAsBytes(cidadeJaCadastrada))
+				MockMvcRequestBuilders.post("/cidades").content(objectMapper.writeValueAsBytes(cidadeJaCadastrada))
 						.accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON))
 				.andExpect(MockMvcResultMatchers.status().isInternalServerError()).andReturn();
 	}
 
 	@Test
 	public void buscarEstadosSucesso() throws Exception {
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/cidade/estado").param("estado", canoas.getEstado()))
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/cidades/estado").param("estado", canoas.getEstado()))
 				.andExpect(jsonPath("$.[0].nome").value(canoas.getNome()))
 				.andExpect(jsonPath("$.[0].estado").value(canoas.getEstado()))
 				.andExpect(jsonPath("$.[1].nome").value(portoAlegre.getNome()))
@@ -138,19 +138,19 @@ public class CidadeControllerTeste {
 
 	@Test
 	public void buscarEstadosErro() throws Exception {
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/cidade/estado").param("estado", "PELOTAS"))
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/cidades/estado").param("estado", "PELOTAS"))
 				.andExpect(MockMvcResultMatchers.status().isNotFound()).andReturn();
 	}
  
 	@Test
 	public void deletarCidadeComSucesso() throws Exception {
-		this.mockMvc.perform(MockMvcRequestBuilders.delete("/cidade/deletar").param("nome",portoAlegre.getNome()))
+		this.mockMvc.perform(MockMvcRequestBuilders.delete("/cidades").param("nome",portoAlegre.getNome()))
 		.andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 	} 
 	
 	@Test
 	public void deletarCidadeSemSucesso() throws Exception {
-		this.mockMvc.perform(MockMvcRequestBuilders.delete("/cidade/deletar").param("nome","Pelotas"))
+		this.mockMvc.perform(MockMvcRequestBuilders.delete("/cidades").param("nome","Pelotas"))
 		.andExpect(MockMvcResultMatchers.status().isNotFound()).andReturn();
 	}
 

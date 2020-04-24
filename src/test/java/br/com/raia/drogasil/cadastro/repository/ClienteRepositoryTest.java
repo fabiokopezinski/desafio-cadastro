@@ -2,8 +2,8 @@ package br.com.raia.drogasil.cadastro.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,7 +34,7 @@ public class ClienteRepositoryTest {
 	private CidadeRepository cidadeRepository;
 	
 	@Rule
-	public ExpectedException thrown= ExpectedException.none();
+	public ExpectedException thrown= ExpectedException.none(); 
 	
 	private Cliente fabio;
 	
@@ -53,10 +53,8 @@ public class ClienteRepositoryTest {
 		cidadeRepository.save(portoAlegre);
 		fabio=new Cliente();
 		
-		Calendar dataNascimento=Calendar.getInstance();
-		dataNascimento.set(Calendar.YEAR,1993);
-		dataNascimento.set(Calendar.MONTH,10);
-		dataNascimento.set(Calendar.DAY_OF_MONTH,21);
+		LocalDate dataNascimento=LocalDate.of(1993, 10, 21);
+		
 		fabio.setCidade(portoAlegre);
 		fabio.setDataNascimento(dataNascimento);
 		fabio.setIdade(26);
@@ -84,7 +82,6 @@ public class ClienteRepositoryTest {
 	@Test
 	public void buscarPorNomeCompleto() {
 		Optional<Cliente> cliente=clienteRepository.findByNomeAndSobrenome("FABIO", "KOPEZINSKI");
-		assertThat(cliente.isPresent());
 		assertThat(cliente.get().getNome()).isEqualTo(fabio.getNome());
 		assertThat(cliente.get().getSobrenome()).isEqualTo(fabio.getSobrenome());
 	}

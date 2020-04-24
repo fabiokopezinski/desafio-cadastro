@@ -60,7 +60,6 @@ public class CidadeRepositoryTest {
 	@Test
 	public void buscarPorNome() {
 		Optional<Cidade> cidade= cidadeRepository.findByNome(portoAlegre.getNome()); 
-		assertThat(cidade.isPresent());
 		assertThat(cidade.get().getNome()).isEqualTo(portoAlegre.getNome());
 	}
 	

@@ -1,6 +1,6 @@
 package br.com.raia.drogasil.cadastro.dto;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -18,7 +18,7 @@ public class ClienteDto {
 	private SexoEnum sexo;
 	private Integer idade;
 	@JsonFormat(pattern = "dd/MM/yyyy")
-	private Date dataNascimento;
+	private LocalDate dataNascimento;
 	private CidadeDto cidade;
 
 }

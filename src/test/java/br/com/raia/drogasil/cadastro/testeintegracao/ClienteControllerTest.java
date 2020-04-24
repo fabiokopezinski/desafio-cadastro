@@ -4,7 +4,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.Calendar;
+import java.time.LocalDate;
 
 import org.junit.After;
 import org.junit.Before;
@@ -68,10 +68,7 @@ public class ClienteControllerTest {
 		canoas.setNome("CANOAS");
 		canoas.setEstado("RIO GRANDE DO SUL");
 
-		Calendar dataNascimento = Calendar.getInstance();
-		dataNascimento.set(Calendar.YEAR, 1993);
-		dataNascimento.set(Calendar.MONTH, 10);
-		dataNascimento.set(Calendar.DAY_OF_MONTH, 21);
+		LocalDate dataNascimento=LocalDate.of(1993, 10, 21);
 		fabio = new Cliente();
 		fabio.setCidade(canoas);
 		fabio.setDataNascimento(dataNascimento);
@@ -105,7 +102,6 @@ public class ClienteControllerTest {
 
 		clienteForm = new ClienteForm();
 		clienteForm.setNome("FABIO");
-		clienteForm.setIdade(27);
 		clienteForm.setCidade(cidadeForm);
 		clienteForm.setDataNascimento(dataNascimento);
 		clienteForm.setSobrenome("CA");
@@ -113,7 +109,6 @@ public class ClienteControllerTest {
 
 		clienteJaExiste = new ClienteForm();
 		clienteJaExiste.setNome("FABIO");
-		clienteJaExiste.setIdade(26);
 		clienteJaExiste.setCidade(cidadeForm);
 		clienteJaExiste.setDataNascimento(dataNascimento);
 		clienteJaExiste.setSobrenome("CARVALHO");
@@ -121,7 +116,6 @@ public class ClienteControllerTest {
 
 		clienteIdade = new ClienteForm();
 		clienteIdade.setNome("FABIO");
-		clienteIdade.setIdade(26);
 		clienteIdade.setCidade(cidadeForm);
 		clienteIdade.setDataNascimento(dataNascimento);
 		clienteIdade.setSobrenome("C");
@@ -138,7 +132,7 @@ public class ClienteControllerTest {
 
 	@Test
 	public void listarTodos() throws Exception {
-		mockMvc.perform(get("/cliente").accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
+		mockMvc.perform(get("/clientes").accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
 				.andExpect(jsonPath("$.[0].nome").value(fabio.getNome()))
 				.andExpect(jsonPath("$.[0].sobrenome").value(fabio.getSobrenome()))
 				.andExpect(jsonPath("$.[1].nome").value(fabioCarvalho.getNome()))
@@ -148,42 +142,38 @@ public class ClienteControllerTest {
 
 	@Test
 	public void buscarPorIdSucesso() throws Exception {
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/cliente/" + fabio.getId()))
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/clientes/" + fabio.getId()))
 				.andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 	}
 
 	@Test
 	public void buscarPorIdErro() throws Exception {
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/cliente/100"))
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/clientes/100"))
 				.andExpect(MockMvcResultMatchers.status().isNotFound()).andReturn();
 	}
 
 	@Test
 	public void cadastrarUmClienteComSucesso() throws JsonProcessingException, Exception {
-		mockMvc.perform(MockMvcRequestBuilders.post("/cliente").content(objectMapper.writeValueAsBytes(clienteForm))
+		mockMvc.perform(MockMvcRequestBuilders.post("/clientes").content(objectMapper.writeValueAsBytes(clienteForm))
 				.accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON))
 				.andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 	}
 
-	@Test
-	public void cadastrarUmClienteComErroIdade() throws JsonProcessingException, Exception {
-		mockMvc.perform(MockMvcRequestBuilders.post("/cliente").content(objectMapper.writeValueAsBytes(clienteIdade))
-				.accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON))
-				.andExpect(MockMvcResultMatchers.status().isInternalServerError()).andReturn();
-	}
 
 	@Test
 	public void cadastrarUmClienteJaExistente() throws JsonProcessingException, Exception {
-		mockMvc.perform(MockMvcRequestBuilders.post("/cliente").content(objectMapper.writeValueAsBytes(clienteJaExiste))
+		mockMvc.perform(MockMvcRequestBuilders.post("/clientes").content(objectMapper.writeValueAsBytes(clienteJaExiste))
 				.accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON))
 				.andExpect(MockMvcResultMatchers.status().isInternalServerError()).andReturn();
 	}
 
 	@Test
 	public void buscarPorNomeSucesso() throws Exception {
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/cliente/nome").param("nome", fabio.getNome()))
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/clientes/nome").param("nome", fabio.getNome()))
 		.andExpect(jsonPath("$.[0].nome").value(fabio.getNome()))
 		.andExpect(jsonPath("$.[0].sobrenome").value(fabio.getSobrenome()))
+		.andExpect(jsonPath("$.[1].nome").value(fabioCarvalho.getNome()))
+		.andExpect(jsonPath("$.[1].sobrenome").value(fabioCarvalho.getSobrenome()))
 		.andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 	}
 	
@@ -195,29 +185,25 @@ public class ClienteControllerTest {
 
 	@Test
 	public void buscarPorNomeCompletoSucesso() throws Exception {
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/cliente/nome").param("nome", "FABIO").param("sobrenome", "KOPEZINSKI"))
-		.andExpect(jsonPath("$.[0].nome").value(fabio.getNome()))
-		.andExpect(jsonPath("$.[0].sobrenome").value(fabio.getSobrenome()))
-		.andExpect(jsonPath("$.[1].nome").value(fabioCarvalho.getNome()))
-		.andExpect(jsonPath("$.[1].sobrenome").value(fabioCarvalho.getSobrenome()))
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/clientes/nomecompleto").param("nome", "FABIO").param("sobrenome", "KOPEZINSKI"))
 		.andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 	}
 	@Test
 	public void buscarPorNomeCompletoErro() throws Exception {
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/cliente/nome").param("nome", "FABIOJ").param("sobrenome", "G"))
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/clientes/nomecompleto").param("nome", "FABIOJ").param("sobrenome", "G"))
 		.andExpect(MockMvcResultMatchers.status().isNotFound()).andReturn();
 	}
 	
 
 	@Test
 	public void deletarClienteComSucesso() throws Exception {
-		this.mockMvc.perform(MockMvcRequestBuilders.delete("/cliente/deletar").param("nome",fabio.getNome()).param("sobrenome", fabio.getSobrenome()))
+		this.mockMvc.perform(MockMvcRequestBuilders.delete("/clientes").param("nome",fabio.getNome()).param("sobrenome", fabio.getSobrenome()))
 		.andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 	}
 	
 	@Test
 	public void deletarClienteSemSucesso() throws Exception {
-		this.mockMvc.perform(MockMvcRequestBuilders.delete("/cliente/deletar").param("nome","KAKA").param("sobrenome", "KA"))
+		this.mockMvc.perform(MockMvcRequestBuilders.delete("/clientes").param("nome","KAKA").param("sobrenome", "KA"))
 		.andExpect(MockMvcResultMatchers.status().isNotFound()).andReturn();
 	}
 	

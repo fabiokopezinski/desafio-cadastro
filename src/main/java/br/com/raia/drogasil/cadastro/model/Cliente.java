@@ -1,6 +1,6 @@
 package br.com.raia.drogasil.cadastro.model;
 
-import java.util.Calendar;
+import java.time.LocalDate;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -39,9 +39,8 @@ public class Cliente {
 	@Enumerated(EnumType.STRING)
 	private SexoEnum sexo;
 	private Integer idade;
-	@NotNull(message = "Informe sua data de nascimento")
 	@JsonFormat(pattern = "dd/MM/yyyy")
-	private Calendar dataNascimento;
+	private LocalDate dataNascimento;
 	@ManyToOne
 	@JoinColumn(name = "cidade_id")
 	@NotNull(message = "Por favor, inserir um endereço")
