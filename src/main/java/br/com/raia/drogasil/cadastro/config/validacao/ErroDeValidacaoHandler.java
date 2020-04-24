@@ -39,12 +39,12 @@ public class ErroDeValidacaoHandler {
 	public ErrorResponse handler(ResourceNotFoundException e) {
 		 String details=e.getLocalizedMessage();
 		 return new ErrorResponse("NOT FOUND",details);
-	}
+	} 
 	@ResponseStatus(code = HttpStatus.BAD_REQUEST)
 	@ExceptionHandler(BusinessException.class)
 	public ErrorResponse handler(BusinessException e) {
 		 String details=e.getLocalizedMessage();
-		 return new ErrorResponse("INTERNAL_SERVER_ERROR",details);
+		 return new ErrorResponse("BAD REQUEST",details);
 	}
 
 }
