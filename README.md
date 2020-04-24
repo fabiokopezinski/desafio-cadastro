@@ -22,7 +22,7 @@ Crie uma solução de backend para ser executada em nuvem que proveja as seguint
 
 
 # Porcentagem de cobertura de testes
-  ![](jacaco.png)
+  ![](jacoco.png)
   
 # Ferramentas 
   +  Java
