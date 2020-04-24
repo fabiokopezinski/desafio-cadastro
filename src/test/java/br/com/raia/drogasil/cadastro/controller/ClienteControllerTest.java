@@ -1,4 +1,4 @@
-package br.com.raia.drogasil.cadastro.testeintegracao;
+package br.com.raia.drogasil.cadastro.controller;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -156,7 +156,7 @@ public class ClienteControllerTest {
 	public void cadastrarUmClienteComSucesso() throws JsonProcessingException, Exception {
 		mockMvc.perform(MockMvcRequestBuilders.post("/clientes").content(objectMapper.writeValueAsBytes(clienteForm))
 				.accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON))
-				.andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+				.andExpect(MockMvcResultMatchers.status().isCreated()).andReturn();
 	}
 
 
@@ -164,7 +164,7 @@ public class ClienteControllerTest {
 	public void cadastrarUmClienteJaExistente() throws JsonProcessingException, Exception {
 		mockMvc.perform(MockMvcRequestBuilders.post("/clientes").content(objectMapper.writeValueAsBytes(clienteJaExiste))
 				.accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON))
-				.andExpect(MockMvcResultMatchers.status().isInternalServerError()).andReturn();
+				.andExpect(MockMvcResultMatchers.status().isBadRequest()).andReturn();
 	}
 
 	@Test
@@ -180,7 +180,7 @@ public class ClienteControllerTest {
 	@Test
 	public void buscarPorNomeErro() throws Exception {
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/cliente/nome").param("nome", "Fá"))
-		.andExpect(MockMvcResultMatchers.status().isNotFound()).andReturn();
+		.andExpect(MockMvcResultMatchers.status().isNotFound()).andReturn(); 
 	}
 
 	@Test

@@ -14,7 +14,7 @@ import br.com.raia.drogasil.cadastro.model.Cliente;
 import br.com.raia.drogasil.cadastro.repository.ClienteRepository;
 
 @Service
-public class ClienteService {
+public class ClienteService { 
 
 	@Autowired
 	private ClienteRepository clienteRepository;

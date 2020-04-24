@@ -1,4 +1,4 @@
-package br.com.raia.drogasil.cadastro.testeintegracao;
+package br.com.raia.drogasil.cadastro.controller;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -108,7 +108,7 @@ public class CidadeControllerTeste {
 	public void cadastrarUmCidadeComSucesso() throws JsonProcessingException, Exception {
 		mockMvc.perform(MockMvcRequestBuilders.post("/cidades").content(objectMapper.writeValueAsBytes(cidadeForm))
 				.accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON))
-				.andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+				.andExpect(MockMvcResultMatchers.status().isCreated()).andReturn();
 	}
 
 	@Test
@@ -123,7 +123,7 @@ public class CidadeControllerTeste {
 		mockMvc.perform(
 				MockMvcRequestBuilders.post("/cidades").content(objectMapper.writeValueAsBytes(cidadeJaCadastrada))
 						.accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON))
-				.andExpect(MockMvcResultMatchers.status().isInternalServerError()).andReturn();
+				.andExpect(MockMvcResultMatchers.status().isBadRequest()).andReturn(); 
 	}
 
 	@Test

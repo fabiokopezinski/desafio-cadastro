@@ -1,4 +1,4 @@
-package br.com.raia.drogasil.cadastro.testeunitario.service;
+package br.com.raia.drogasil.cadastro.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;

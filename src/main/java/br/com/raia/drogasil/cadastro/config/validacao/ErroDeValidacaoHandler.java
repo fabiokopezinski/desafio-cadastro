@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
-public class ErroDeValidacaoHandler {
+public class ErroDeValidacaoHandler { 
 
 	@Autowired
 	private MessageSource messageSource;
@@ -22,7 +22,7 @@ public class ErroDeValidacaoHandler {
 	@ResponseStatus(code = HttpStatus.BAD_REQUEST)
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public List<ErroDeFormularioDto> handle(MethodArgumentNotValidException exception) {
-		List<ErroDeFormularioDto> dto = new ArrayList<>();
+		List<ErroDeFormularioDto> dto = new ArrayList<>(); 
 
 		List<FieldError> fieldErrors = exception.getBindingResult().getFieldErrors();
 		fieldErrors.forEach(e -> {
@@ -40,7 +40,7 @@ public class ErroDeValidacaoHandler {
 		 String details=e.getLocalizedMessage();
 		 return new ErrorResponse("NOT FOUND",details);
 	}
-	@ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR)
+	@ResponseStatus(code = HttpStatus.BAD_REQUEST)
 	@ExceptionHandler(BusinessException.class)
 	public ErrorResponse handler(BusinessException e) {
 		 String details=e.getLocalizedMessage();

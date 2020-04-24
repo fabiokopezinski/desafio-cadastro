@@ -6,6 +6,7 @@ import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.raia.drogasil.cadastro.config.validacao.ErroDeFormularioDto;
@@ -33,7 +35,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 @RestController
 @RequestMapping("/clientes")
-public class ClienteController { 
+public class ClienteController {  
 
 	@Autowired
 	private ClienteService clienteService;
@@ -46,6 +48,7 @@ public class ClienteController {
 			@ApiResponse(responseCode = "200", description = "Lista de clientes", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ClienteDto.class))))
 
 	}) 
+	@ResponseStatus(code = HttpStatus.OK)
 	@GetMapping
 	public List<ClienteDto> listarClientes() {
 		return clienteConverter.toArray(clienteService.listarClientes());
@@ -59,7 +62,7 @@ public class ClienteController {
 					content = @Content(schema = @Schema(implementation = ClienteDto.class))),
 
 			@ApiResponse(responseCode = "404", description = "Cliente não encontrado") })
-
+	@ResponseStatus(code = HttpStatus.OK)
 	@GetMapping("/{id}")
 	public ClienteDto buscarPorId(@PathVariable Integer id) {
 		return clienteConverter.toEntity(clienteService.buscarPorId(id));
@@ -73,6 +76,7 @@ public class ClienteController {
 					content = @Content(schema = @Schema(implementation = ClienteDto.class))),
 
 			@ApiResponse(responseCode = "404", description = "Cliente não encontrado") })
+	@ResponseStatus(code = HttpStatus.OK)
 	@GetMapping("/nomecompleto")
 	public ClienteDto buscarPorNomeCompleto(@RequestParam("nome") String nome,
 			@RequestParam("sobrenome") String sobrenome) {
@@ -87,6 +91,7 @@ public class ClienteController {
 					content = @Content(schema = @Schema(implementation = ClienteDto.class))),
 
 			@ApiResponse(responseCode = "404", description = "Clientes não encontrados") })
+	@ResponseStatus(code = HttpStatus.OK)
 	@GetMapping("/nome")
 	public List<ClienteDto> buscarPorNome(@RequestParam("nome") String nome) {
 		return clienteConverter.toArray(clienteService.buscarPorNome(nome));
@@ -101,6 +106,7 @@ public class ClienteController {
 			@ApiResponse(responseCode = "400", description = "Algum parâmetro não foi informado", content = @Content(schema = @Schema(implementation = ErroDeFormularioDto.class))),
 
 			@ApiResponse(responseCode = "500", description = "Cliente não encontrado", content = @Content(schema = @Schema(implementation = ErrorResponse.class))) })
+	@ResponseStatus(code = HttpStatus.OK)
 	@PutMapping
 	@Transactional
 	public ClienteDto atualizarCliente(@RequestBody @Valid ClienteAtualizarForm atualizarForm) {
@@ -110,13 +116,13 @@ public class ClienteController {
 	@Operation(summary = "Cadastro novo cliente", description = "Realiza um novo cadastro de algum cliente")
 	@ApiResponses(value = {
 
-			@ApiResponse(responseCode = "200", description = "Cliente cadastrado",
+			@ApiResponse(responseCode = "201", description = "Cliente cadastrado",
 
 					content = @Content(schema = @Schema(implementation = ClienteDto.class))),
 			@ApiResponse(responseCode = "400", description = "Algum parâmetro não foi informado", content = @Content(schema = @Schema(implementation = ErroDeFormularioDto.class))),
 
 			@ApiResponse(responseCode = "500", description = "Cliente já foi cadastrado", content = @Content(schema = @Schema(implementation = ErrorResponse.class))) })
-
+	@ResponseStatus(code = HttpStatus.CREATED)
 	@PostMapping
 	@Transactional
 	public ClienteDto cadastrar(@RequestBody @Valid ClienteForm clienteForm) {
@@ -131,6 +137,7 @@ public class ClienteController {
 					content = @Content(schema = @Schema(implementation = CidadeDto.class))),
 
 			@ApiResponse(responseCode = "404", description = "Não foi encontrada nenhuma cliente com essa nome") })
+	@ResponseStatus(code = HttpStatus.OK)
 	@DeleteMapping
 	@Transactional
 	public String deletarCliente(@RequestParam("nome") String nome, @RequestParam("sobrenome") String sobrenome) {

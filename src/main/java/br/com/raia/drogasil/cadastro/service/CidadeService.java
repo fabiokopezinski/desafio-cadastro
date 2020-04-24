@@ -18,14 +18,14 @@ public class CidadeService {
 	private CidadeRepository cidadeRepository;
 
 	public List<Cidade> listaDeCidades() {
-		return cidadeRepository.findAll();  
+		return cidadeRepository.findAll();   
 	}
 
 	public List<Cidade> buscarPorEstado(String estado) {
 
 		List<Cidade> estadoAchado = cidadeRepository.findByEstado(estado.toUpperCase());
 		if (estadoAchado.isEmpty()) {
-			throw new ResourceNotFoundException("Não achou nenhum estado");
+			throw new ResourceNotFoundException("Não achou nenhum estado"); 
 		}
 		return estadoAchado;
 
