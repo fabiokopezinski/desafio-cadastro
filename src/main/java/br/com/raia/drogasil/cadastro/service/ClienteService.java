@@ -69,8 +69,8 @@ public class ClienteService {
 		boolean present = clienteRepository.findById(cliente.getId()).isPresent(); 
 		String nome = cliente.getNome().toUpperCase();
 		String sobrenome = cliente.getSobrenome().toUpperCase();
-		Cliente buscarNomeESobrenome = buscarNomeESobrenome(nome.toUpperCase(), sobrenome.toUpperCase());
-		if (present && buscarNomeESobrenome == null) { 
+	    Optional<Cliente> buscarNomeESobrenome = clienteRepository.findByNomeAndSobrenome(cliente.getNome().toUpperCase(), cliente.getSobrenome().toUpperCase());
+		if (present && buscarNomeESobrenome.isEmpty()) { 
 			cliente.setNome(nome);
 			cliente.setSobrenome(sobrenome);
 			Cliente novoCliente = clienteRepository.getOne(cliente.getId());
