@@ -1,4 +1,4 @@
-package br.com.raia.drogasil.cadastro.model;
+package br.com.raia.drogasil.cadastro.domain.model;
 
 import java.util.List;
 
@@ -23,15 +23,15 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@ToString(exclude = { "cliente" }) 
+@ToString(exclude = { "cliente" })
 @Table(name = "CIDADE")
-
+@SequenceGenerator(name = "CIDADE", sequenceName = "cidade_seq_id", allocationSize = 1)
 public class Cidade {
 
 	@Id
 	@Column(name = "id", nullable = false, updatable = false)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cidade_seq_id")
-	@SequenceGenerator(name = "CIDADE", sequenceName = "cidade_seq_id", allocationSize = 1)
+	
 	private Integer id;
 	@NotBlank
 	@Column(unique = true)

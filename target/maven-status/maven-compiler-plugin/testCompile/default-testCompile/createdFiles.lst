@@ -1,0 +1,5 @@
+br\com\raia\drogasil\cadastro\CadastroApplicationTests.class
+br\com\raia\drogasil\cadastro\controller\CidadeControllerTeste.class
+br\com\raia\drogasil\cadastro\steps\CidadeControllerSteps.class
+br\com\raia\drogasil\cadastro\scenario\ScenarioFactory.class
+br\com\raia\drogasil\cadastro\runner\Runner.class

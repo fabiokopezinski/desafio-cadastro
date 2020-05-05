@@ -19,7 +19,7 @@ public class Swagger {
 
 				.info(new Info().title("Sistema de cadastros").description(
 
-						"Documentação da api de sistema de cadastros").version("1.2"));
+						"Documentação da api de sistema de cadastros").version("1.3"));
 
 	}
 }

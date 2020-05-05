@@ -18,125 +18,95 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.raia.drogasil.cadastro.config.validacao.ErroDeFormularioDto;
-import br.com.raia.drogasil.cadastro.config.validacao.ErrorResponse;
-import br.com.raia.drogasil.cadastro.converter.ClienteConverter;
-import br.com.raia.drogasil.cadastro.dto.CidadeDto;
-import br.com.raia.drogasil.cadastro.dto.ClienteDto;
-import br.com.raia.drogasil.cadastro.form.ClienteAtualizarForm;
-import br.com.raia.drogasil.cadastro.form.ClienteForm;
+import br.com.raia.drogasil.cadastro.annotation.DocumentacaoSwaggerCliente;
+import br.com.raia.drogasil.cadastro.domain.dto.ClienteDTO;
+import br.com.raia.drogasil.cadastro.domain.form.ClienteAtualizarForm;
+import br.com.raia.drogasil.cadastro.domain.form.ClienteForm;
 import br.com.raia.drogasil.cadastro.service.ClienteService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/clientes")
-public class ClienteController {  
+@Tag(name = "Cliente", description = "API")
+public class ClienteController {
 
 	@Autowired
 	private ClienteService clienteService;
 
-	@Autowired
-	private ClienteConverter clienteConverter;
+	private final String LISTAR_CLIENTES = "Listar clientes";
+	private final String LISTAGEM_DE_CLIENTES = "Listagem de clientes";
 
-	@Operation(summary = "Listar clientes", description = "Listagem de clientes")
-	@ApiResponses(value = {
-			@ApiResponse(responseCode = "200", description = "Lista de clientes", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ClienteDto.class))))
+	private final String BUSCAR_CLIENTE_POR_ID = "Buscar cliente por ID";
+	private final String FAZ_UMA_BUSCAR_POR_ID = "Faz uma buscar por um cliente pelo ID";
 
-	}) 
+	private final String BUSCAR_CLIENTE_POR_NOME_COMPLETO = "Buscar cliente por nome completo";
+	private final String FAZ_UMA_BUSCAR_PELO_NOME_COMPLETO = "Faz uma busca pelo nome completo";
+
+	private final String BUSCAR_CLIENTES_PELO_NOME = "Buscar clientes pelo nome";
+	private final String FAZ_UMA_BUSCA_POR_CLIENTES_PELO_MESMO_NOME = "Faz uma busca por clientes pelo mesmo nome";
+
+	private final String ATUALIZAR_DADOS_CLIENTE = "Atualizar dados do cliente";
+	private final String ATUALIZA_O_NOME_DO_CLIENTE = "Atualiza o nome do cliente";
+	private final String CADASTRO_NOVO_CLIENTE = "Cadastro novo cliente";
+	private final String REALIZAR_NOVO_CADASTRO = "Realiza um novo cadastro de algum cliente";
+
+	private final String DELETAR = "Deletar cliente";
+	private final String APAGAR_NO_BANCO = "Apagar um cliente do banco de dados";
+
+	@Operation(summary = LISTAR_CLIENTES, description = LISTAGEM_DE_CLIENTES)
+	@DocumentacaoSwaggerCliente
 	@ResponseStatus(code = HttpStatus.OK)
 	@GetMapping
-	public List<ClienteDto> listarClientes() {
-		return clienteConverter.toArray(clienteService.listarClientes());
+	public List<ClienteDTO> listarClientes() {
+		return clienteService.listarClientes();
 	}
 
-	@Operation(summary = "Buscar cliente por ID", description = "Faz uma buscar por um cliente pelo ID")
-	@ApiResponses(value = {
-
-			@ApiResponse(responseCode = "200", description = "Cliente encontrado",
-
-					content = @Content(schema = @Schema(implementation = ClienteDto.class))),
-
-			@ApiResponse(responseCode = "404", description = "Cliente não encontrado") })
+	@Operation(summary = BUSCAR_CLIENTE_POR_ID, description = FAZ_UMA_BUSCAR_POR_ID)
+	@DocumentacaoSwaggerCliente
 	@ResponseStatus(code = HttpStatus.OK)
 	@GetMapping("/{id}")
-	public ClienteDto buscarPorId(@PathVariable Integer id) {
-		return clienteConverter.toEntity(clienteService.buscarPorId(id));
+	public ClienteDTO buscarPorId(@PathVariable Integer id) {
+		return clienteService.buscarPorId(id); 
 	}
 
-	@Operation(summary = "Buscar cliente por nome completo", description = "Faz uma busca pelo nome completo")
-	@ApiResponses(value = {
-
-			@ApiResponse(responseCode = "200", description = "Cliente encontrado",
-
-					content = @Content(schema = @Schema(implementation = ClienteDto.class))),
-
-			@ApiResponse(responseCode = "404", description = "Cliente não encontrado") })
+	@Operation(summary = BUSCAR_CLIENTE_POR_NOME_COMPLETO, description = FAZ_UMA_BUSCAR_PELO_NOME_COMPLETO)
+	@DocumentacaoSwaggerCliente
 	@ResponseStatus(code = HttpStatus.OK)
 	@GetMapping("/nomecompleto")
-	public ClienteDto buscarPorNomeCompleto(@RequestParam("nome") String nome,
+	public ClienteDTO buscarPorNomeCompleto(@RequestParam("nome") String nome,
 			@RequestParam("sobrenome") String sobrenome) {
-		return clienteConverter.toEntity(clienteService.buscarNomeESobrenome(nome, sobrenome));
+		return clienteService.buscarNomeESobrenome(nome, sobrenome);
 	}
 
-	@Operation(summary = "Buscar clientes pelo nome", description = "Faz uma busca por clientes pelo mesmo nome")
-	@ApiResponses(value = {
-
-			@ApiResponse(responseCode = "200", description = "Clientes encontrados",
-
-					content = @Content(schema = @Schema(implementation = ClienteDto.class))),
-
-			@ApiResponse(responseCode = "404", description = "Clientes não encontrados") })
+	@Operation(summary = BUSCAR_CLIENTES_PELO_NOME, description = FAZ_UMA_BUSCA_POR_CLIENTES_PELO_MESMO_NOME)
+	@DocumentacaoSwaggerCliente
 	@ResponseStatus(code = HttpStatus.OK)
 	@GetMapping("/nome")
-	public List<ClienteDto> buscarPorNome(@RequestParam("nome") String nome) {
-		return clienteConverter.toArray(clienteService.buscarPorNome(nome));
+	public List<ClienteDTO> buscarPorNome(@RequestParam("nome") String nome) {
+		return clienteService.buscarPorNome(nome);
 	}
 
-	@Operation(summary = "Atualizar dados do cliente", description = "Atualiza o nome do cliente")
-	@ApiResponses(value = {
-
-			@ApiResponse(responseCode = "200", description = "Cliente Atualizado",
-
-					content = @Content(schema = @Schema(implementation = ClienteDto.class))),
-			@ApiResponse(responseCode = "400", description = "Algum parâmetro não foi informado", content = @Content(schema = @Schema(implementation = ErroDeFormularioDto.class))),
-
-			@ApiResponse(responseCode = "500", description = "Cliente não encontrado", content = @Content(schema = @Schema(implementation = ErrorResponse.class))) })
-	@ResponseStatus(code = HttpStatus.OK)
+	@Operation(summary = ATUALIZAR_DADOS_CLIENTE, description = ATUALIZA_O_NOME_DO_CLIENTE)
+	@DocumentacaoSwaggerCliente
 	@PutMapping
+	@ResponseStatus(code = HttpStatus.OK)
 	@Transactional
-	public ClienteDto atualizarCliente(@RequestBody @Valid ClienteAtualizarForm atualizarForm) {
-		return clienteConverter.toOutPut(clienteService.atualizarCliente(clienteConverter.toEntity(atualizarForm)));
+	public ClienteDTO atualizarCliente(@RequestBody @Valid ClienteAtualizarForm atualizarForm) {
+		return clienteService.atualizarCliente(atualizarForm);
 	}
-	
-	@Operation(summary = "Cadastro novo cliente", description = "Realiza um novo cadastro de algum cliente")
-	@ApiResponses(value = {
 
-			@ApiResponse(responseCode = "201", description = "Cliente cadastrado",
-
-					content = @Content(schema = @Schema(implementation = ClienteDto.class))),
-			@ApiResponse(responseCode = "400", description = "Algum parâmetro não foi informado", content = @Content(schema = @Schema(implementation = ErroDeFormularioDto.class))),
-
-			@ApiResponse(responseCode = "500", description = "Cliente já foi cadastrado", content = @Content(schema = @Schema(implementation = ErrorResponse.class))) })
+	@Operation(summary = CADASTRO_NOVO_CLIENTE, description = REALIZAR_NOVO_CADASTRO)
+	@DocumentacaoSwaggerCliente
 	@ResponseStatus(code = HttpStatus.CREATED)
 	@PostMapping
 	@Transactional
-	public ClienteDto cadastrar(@RequestBody @Valid ClienteForm clienteForm) {
-		return clienteConverter.toOutPut(clienteService.cadastrar(clienteConverter.toEntity(clienteForm)));
+	public ClienteDTO cadastrar(@RequestBody @Valid ClienteForm clienteForm) {
+		return clienteService.cadastrar(clienteForm);
 	}
 
-	@Operation(summary = "Deletar cliente", description = "Apagar um cliente do banco de dados")
-	@ApiResponses(value = {
-
-			@ApiResponse(responseCode = "200", description = "Cliente deletad0 com sucesso",
-
-					content = @Content(schema = @Schema(implementation = CidadeDto.class))),
-
-			@ApiResponse(responseCode = "404", description = "Não foi encontrada nenhuma cliente com essa nome") })
+	@Operation(summary = DELETAR, description = APAGAR_NO_BANCO)
+	@DocumentacaoSwaggerCliente
 	@ResponseStatus(code = HttpStatus.OK)
 	@DeleteMapping
 	@Transactional

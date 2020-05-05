@@ -1,8 +1,12 @@
 package br.com.raia.drogasil.cadastro.controller;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import org.junit.After;
 import org.junit.Before;
@@ -11,147 +15,101 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import br.com.raia.drogasil.cadastro.form.CidadeForm;
-import br.com.raia.drogasil.cadastro.model.Cidade;
-import br.com.raia.drogasil.cadastro.repository.CidadeRepository;
+import br.com.raia.drogasil.cadastro.converter.Converter;
+import br.com.raia.drogasil.cadastro.domain.dto.CidadeDTO;
+import br.com.raia.drogasil.cadastro.domain.form.CidadeForm;
+import br.com.raia.drogasil.cadastro.domain.model.Cidade;
+import br.com.raia.drogasil.cadastro.domain.repository.CidadeRepository;
+import br.com.raia.drogasil.cadastro.scenario.ScenarioFactory;
+import br.com.raia.drogasil.cadastro.service.CidadeService;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-public class CidadeControllerTeste { 
+public class CidadeControllerTeste {
 
-	@Autowired
-	private MockMvc mockMvc;
-
-	@Autowired
-	private ObjectMapper objectMapper;
-
-	@Autowired
+	@MockBean
 	private CidadeRepository cidadeRepository;
- 
-	private Cidade canoas;
+	@MockBean
+	private CidadeService cidadeService;
 
-	private Cidade portoAlegre;
+	@Autowired
+	private CidadeController cidadeController;
+	@Autowired
+	private Converter<Cidade, CidadeDTO> conversorCidade;
+	@Autowired
+	private Converter<CidadeForm, CidadeDTO> conversorCidadeForm;
 
-	private CidadeForm cidadeForm;
-
-	private CidadeForm cidadeErro;
-
-	private CidadeForm cidadeJaCadastrada;
+	private List<CidadeDTO> listaCidades = new ArrayList<CidadeDTO>();
 
 	@Before
 	public void antes() {
-		this.cidadeRepository.deleteAll();
+		this.cidadeRepository.save(ScenarioFactory.CIDADE_PORTO_ALEGRE); 
+		this.cidadeRepository.save(ScenarioFactory.CIDADE_PASSO_FUNDO);
 
-		canoas = new Cidade();
-		canoas.setNome("CANOAS");
-		canoas.setEstado("RIO GRANDE DO SUL");
+		listaCidades.add(conversorCidade.toEntity(ScenarioFactory.CIDADE_PORTO_ALEGRE, CidadeDTO.class));
+		listaCidades.add(conversorCidade.toEntity(ScenarioFactory.CIDADE_PASSO_FUNDO, CidadeDTO.class));
 
-		this.cidadeRepository.save(canoas);
-
-		portoAlegre = new Cidade();
-		portoAlegre.setNome("PORTO ALEGRE");
-		portoAlegre.setEstado("RIO GRANDE DO SUL"); 
-
-		this.cidadeRepository.save(portoAlegre);
-
-		cidadeForm = new CidadeForm();
-		cidadeForm.setEstado("Floripa");
-		cidadeForm.setNome("Floripa");
- 
-		cidadeErro = new CidadeForm();
-		cidadeErro.setNome("");
-		cidadeErro.setEstado("");
-
-		cidadeJaCadastrada = new CidadeForm();
-		cidadeJaCadastrada.setEstado("RIO GRANDE DO SUL");
-		cidadeJaCadastrada.setNome("CANOAS");
 	}
-	
+
 	@After
-	public void depois() { 
+	public void depois() {
 		this.cidadeRepository.deleteAll();
 	}
 
 	@Test
 	public void listarTodos() throws Exception {
-		mockMvc.perform(get("/cidades").accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
-				.andExpect(jsonPath("$.[0].nome").value(canoas.getNome()))
-				.andExpect(jsonPath("$.[0].estado").value(canoas.getEstado()))
-				.andExpect(jsonPath("$.[1].nome").value(portoAlegre.getNome()))
-				.andExpect(jsonPath("$.[1].estado").value(portoAlegre.getEstado()))
-				.andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+		when(cidadeService.listaDeCidades()).thenReturn(listaCidades);
+		List<CidadeDTO> listarCidades = cidadeController.listaDeCidades();
+		assertThat(listarCidades.get(0).getNome()).isEqualTo(ScenarioFactory.CIDADE_PORTO_ALEGRE.getNome());
+		assertThat(listarCidades.get(0).getEstado()).isEqualTo(ScenarioFactory.CIDADE_PORTO_ALEGRE.getEstado());
+		assertThat(listarCidades.get(1).getNome()).isEqualTo(ScenarioFactory.CIDADE_PASSO_FUNDO.getNome());
+		assertThat(listarCidades.get(1).getEstado()).isEqualTo(ScenarioFactory.CIDADE_PASSO_FUNDO.getEstado());
+
 	}
 
 	@Test
 	public void buscarPorCidadeSucesso() throws Exception {
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/cidades/nome").param("nome", canoas.getNome()))
-				.andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
-	}
-
-	@Test
-	public void buscarPorCidadeError() throws Exception {
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/cidades/nome").param("nome", "C"))
-				.andExpect(MockMvcResultMatchers.status().isNotFound()).andReturn();
-	}
-
-	@Test
-	public void cadastrarUmCidadeComSucesso() throws JsonProcessingException, Exception {
-		mockMvc.perform(MockMvcRequestBuilders.post("/cidades").content(objectMapper.writeValueAsBytes(cidadeForm))
-				.accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON))
-				.andExpect(MockMvcResultMatchers.status().isCreated()).andReturn();
-	}
-
-	@Test
-	public void cadastrarUmCidadeErro() throws JsonProcessingException, Exception {
-		mockMvc.perform(MockMvcRequestBuilders.post("/cidades").content(objectMapper.writeValueAsBytes(cidadeErro))
-				.accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON))
-				.andExpect(MockMvcResultMatchers.status().isBadRequest()).andReturn();
-	}
- 
-	@Test
-	public void cadastrarUmCidadeJaCadastrado() throws JsonProcessingException, Exception {
-		mockMvc.perform(
-				MockMvcRequestBuilders.post("/cidades").content(objectMapper.writeValueAsBytes(cidadeJaCadastrada))
-						.accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON))
-				.andExpect(MockMvcResultMatchers.status().isBadRequest()).andReturn(); 
+		Optional<CidadeDTO> cidade = Optional.empty();
+		cidade = Optional.of(conversorCidade.toEntity(ScenarioFactory.CIDADE_PORTO_ALEGRE, CidadeDTO.class));
+		when(cidadeService.buscarPorCidade(ScenarioFactory.PORTO_ALEGRE)).thenReturn(cidade.get());
+		CidadeDTO novaCidade = cidadeService.buscarPorCidade(ScenarioFactory.PORTO_ALEGRE);
+		assertThat(novaCidade.getNome()).isEqualTo(ScenarioFactory.PORTO_ALEGRE);
 	}
 
 	@Test
 	public void buscarEstadosSucesso() throws Exception {
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/cidades/estado").param("estado", canoas.getEstado()))
-				.andExpect(jsonPath("$.[0].nome").value(canoas.getNome()))
-				.andExpect(jsonPath("$.[0].estado").value(canoas.getEstado()))
-				.andExpect(jsonPath("$.[1].nome").value(portoAlegre.getNome()))
-				.andExpect(jsonPath("$.[1].estado").value(portoAlegre.getEstado()))
-				.andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
-	} 
+
+		when(cidadeService.buscarPorEstado(ScenarioFactory.RIO_GRANDE_DO_SUL)).thenReturn(listaCidades);
+		List<CidadeDTO> novaListaCidades = cidadeController.buscarPorEstado(ScenarioFactory.RIO_GRANDE_DO_SUL);
+		assertThat(novaListaCidades.get(0).getEstado()).isEqualTo(ScenarioFactory.RIO_GRANDE_DO_SUL);
+		assertThat(novaListaCidades.get(1).getEstado()).isEqualTo(ScenarioFactory.RIO_GRANDE_DO_SUL);
+	}
 
 	@Test
-	public void buscarEstadosErro() throws Exception {
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/cidades/estado").param("estado", "PELOTAS"))
-				.andExpect(MockMvcResultMatchers.status().isNotFound()).andReturn();
+	public void cadastrar() throws Exception {
+		when(cidadeService.cadastrar(ScenarioFactory.CIDADE_Form))
+				.thenReturn(conversorCidadeForm.toEntity(ScenarioFactory.CIDADE_Form, CidadeDTO.class));
+		CidadeDTO retorno = cidadeController.cadastrarCidade(ScenarioFactory.CIDADE_Form);
+		assertThat(retorno.getNome()).isEqualTo(ScenarioFactory.CIDADE_Form.getNome());
+		assertThat(retorno.getEstado()).isEqualTo(ScenarioFactory.CIDADE_Form.getEstado());
 	}
- 
+
 	@Test
 	public void deletarCidadeComSucesso() throws Exception {
-		this.mockMvc.perform(MockMvcRequestBuilders.delete("/cidades").param("nome",portoAlegre.getNome()))
-		.andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
-	} 
-	
+		when(cidadeService.deletar(ScenarioFactory.PORTO_ALEGRE)).thenReturn(ScenarioFactory.DELETAR);
+		String deletado = cidadeController.deletarCidade(ScenarioFactory.PORTO_ALEGRE);
+		assertEquals(deletado, ScenarioFactory.DELETAR);
+	}
+
 	@Test
 	public void deletarCidadeSemSucesso() throws Exception {
-		this.mockMvc.perform(MockMvcRequestBuilders.delete("/cidades").param("nome","Pelotas"))
-		.andExpect(MockMvcResultMatchers.status().isNotFound()).andReturn();
+		when(cidadeService.deletar(ScenarioFactory.SAO_PAULO)).thenReturn(ScenarioFactory.NAO_FOI_ENCONTRADO);
+		String deletado = cidadeController.deletarCidade(ScenarioFactory.SAO_PAULO);
+		assertEquals(deletado, ScenarioFactory.NAO_FOI_ENCONTRADO);
 	}
 
 }

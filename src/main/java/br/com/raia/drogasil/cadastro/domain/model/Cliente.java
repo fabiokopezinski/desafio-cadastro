@@ -1,4 +1,4 @@
-package br.com.raia.drogasil.cadastro.model;
+package br.com.raia.drogasil.cadastro.domain.model;
 
 import java.time.LocalDate;
 
@@ -17,16 +17,20 @@ import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import br.com.raia.drogasil.cadastro.enumeration.SexoEnum;
+import br.com.raia.drogasil.cadastro.domain.enumeration.SexoEnum;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "CLIENTE")
+@ToString
 @SequenceGenerator(name = "CLIENTE", sequenceName = "cliente_seq_id", initialValue = 1, allocationSize = 1)
 public class Cliente {
 

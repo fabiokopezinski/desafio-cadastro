@@ -17,12 +17,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import br.com.raia.drogasil.cadastro.model.Cidade;
+import br.com.raia.drogasil.cadastro.domain.model.Cidade;
+import br.com.raia.drogasil.cadastro.domain.repository.CidadeRepository;
+import br.com.raia.drogasil.cadastro.scenario.ScenarioFactory;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @ActiveProfiles("test")
-public class CidadeRepositoryTest { 
+public class CidadeRepositoryTest {
 
 	@Autowired
 	private CidadeRepository cidadeRepository;
@@ -30,19 +32,13 @@ public class CidadeRepositoryTest {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
-	private Cidade portoAlegre;
-	
-	private List<Cidade> cidadesLista= new ArrayList<Cidade>();
+	private List<Cidade> cidadesLista = new ArrayList<Cidade>();
 
 	@Before
 	public void antes() {
 
-		this.cidadeRepository.deleteAll();
-		portoAlegre = new Cidade(); 
-		portoAlegre.setEstado("RIO GRANDE DO SUL");
-		portoAlegre.setNome("PORTO ALEGRE"); 
-		cidadesLista.add(portoAlegre);
-		cidadeRepository.save(portoAlegre); 
+		cidadesLista.add(ScenarioFactory.CIDADE_PORTO_ALEGRE);
+		this.cidadeRepository.save(ScenarioFactory.CIDADE_PORTO_ALEGRE);
 	}
 
 	@After
@@ -51,23 +47,15 @@ public class CidadeRepositoryTest {
 	}
 
 	@Test
-	public void salvar() {
-
-		assertThat("RIO GRANDE DO SUL").isEqualTo(portoAlegre.getEstado());
-		assertThat("PORTO ALEGRE").isEqualTo(portoAlegre.getNome());
-	}
-	
-	@Test
 	public void buscarPorNome() {
-		Optional<Cidade> cidade= cidadeRepository.findByNome(portoAlegre.getNome()); 
-		assertThat(cidade.get().getNome()).isEqualTo(portoAlegre.getNome());
+		Optional<Cidade> cidade = cidadeRepository.findByNome(ScenarioFactory.CIDADE_PORTO_ALEGRE.getNome());
+		assertThat(cidade.get().getNome()).isEqualTo(ScenarioFactory.CIDADE_PORTO_ALEGRE.getNome());
 	}
-	
+
 	@Test
-	public void buscarPorEstado()
-	{
-		List<Cidade> cidades= cidadeRepository.findByEstado("RIO GRANDE DO SUL");
-		assertThat(cidades.get(0).getEstado()).isEqualTo(cidadesLista.get(0).getEstado());
+	public void buscarPorEstado() {
+		Optional<List<Cidade>> cidades = cidadeRepository.findByEstado(ScenarioFactory.RIO_GRANDE_DO_SUL);
+		assertThat(cidades.get().get(0).getEstado()).isEqualTo(cidadesLista.get(0).getEstado());
 	}
 
 }

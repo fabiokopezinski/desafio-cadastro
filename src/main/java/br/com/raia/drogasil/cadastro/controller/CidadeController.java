@@ -16,93 +16,72 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.raia.drogasil.cadastro.config.validacao.ErroDeFormularioDto;
-import br.com.raia.drogasil.cadastro.config.validacao.ErrorResponse;
-import br.com.raia.drogasil.cadastro.converter.CidadeConverter;
-import br.com.raia.drogasil.cadastro.dto.CidadeDto;
-import br.com.raia.drogasil.cadastro.form.CidadeForm;
+import br.com.raia.drogasil.cadastro.annotation.DocumentacaoSwaggerCidade;
+import br.com.raia.drogasil.cadastro.domain.dto.CidadeDTO;
+import br.com.raia.drogasil.cadastro.domain.form.CidadeForm;
 import br.com.raia.drogasil.cadastro.service.CidadeService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/cidades")
-public class CidadeController { 
+@Tag(name = "Cidade", description = "API")
+public class CidadeController {
 
 	@Autowired
 	private CidadeService cidadeService;
 
-	@Autowired
-	private CidadeConverter cidadeConverter;
+	private final String LISTAR_CIDADE_ESTADOS = "Listar cidade e estados";
+	private final String LISTA_TODOS_OS_ESTADOS_E_CIDADES = "listas todos os estados e cidades";
 
-	@Operation(summary = "Listar todos as cidades e estados", description = "Lista todos os estados cadastrados")
-	@ApiResponses(value = {
-			@ApiResponse(responseCode = "200", description = "Lista de cidades", content = @Content(array = @ArraySchema(schema = @Schema(implementation = CidadeDto.class))))
+	private final String BUSCAR_POR_CIDADE = "Buscar por cidade";
+	private final String BUSCA_POR_UMA_CIDADE_ESPECIFICA = "Busca por uma cidade especifica";
 
-	})
+	private final String BUSCAR_POR_ESTADO = "Buscar por estado";
+	private final String BUSCA_POR_UMA_ESTADO_ESPECIFICA = "Busca por uma estado especifica";
+
+	private final String CADASTRO_DE_UMA_CIDADE = "Cadastro de cidade";
+	private final String CADASTRAR_UM_NOVA_CIDADE = "Cadastrar uma nova cidade";
+
+	private final String DELETAR_UMA_CIDADE = "Deletar cidade";
+	private final String APAGA_UMA_CIDADE_DO_BANCO = "Apagar uma cidade no banco de dados";
+
+	@Operation(summary = LISTAR_CIDADE_ESTADOS, description = LISTA_TODOS_OS_ESTADOS_E_CIDADES)
+	@DocumentacaoSwaggerCidade
 	@ResponseStatus(code = HttpStatus.OK)
 	@GetMapping
-	public List<CidadeDto> listaDeCidades() {
-		return cidadeConverter.toArray(cidadeService.listaDeCidades());
+	public List<CidadeDTO> listaDeCidades() {
+		return cidadeService.listaDeCidades();
 	}
 
-	@Operation(summary = "Buscar por cidade", description = "Busca por uma cidade especifica")
-	@ApiResponses(value = {
-
-			@ApiResponse(responseCode = "200", description = "Cidade encontrada",
-
-					content = @Content(schema = @Schema(implementation = CidadeDto.class))),
-
-			@ApiResponse(responseCode = "404", description = "Cidade não encontrada") })
+	@Operation(summary = BUSCAR_POR_CIDADE, description = BUSCA_POR_UMA_CIDADE_ESPECIFICA)
+	@DocumentacaoSwaggerCidade
 	@ResponseStatus(code = HttpStatus.OK)
 	@GetMapping("/nome")
-	public CidadeDto buscarPorCidade(@RequestParam("nome") String nome) {
-		return cidadeConverter.toOutPut(cidadeService.buscarPorCidade(nome));
+	public CidadeDTO buscarPorCidade(@RequestParam("nome") String nome) {
+		return cidadeService.buscarPorCidade(nome);
 	}
 
-	@Operation(summary = "Buscar por estado", description = "Busca por um estado especifica")
-	@ApiResponses(value = {
-
-			@ApiResponse(responseCode = "200", description = "Estado encontrado",
-
-					content = @Content(schema = @Schema(implementation = CidadeDto.class))),
-
-			@ApiResponse(responseCode = "404", description = "Estado não encontrado") })
+	@Operation(summary = BUSCAR_POR_ESTADO, description = BUSCA_POR_UMA_ESTADO_ESPECIFICA)
+	@DocumentacaoSwaggerCidade
 	@ResponseStatus(code = HttpStatus.OK)
 	@GetMapping("/estado")
-	public List<CidadeDto> buscarPorEstado(@RequestParam("estado") String estado) {
+	public List<CidadeDTO> buscarPorEstado(@RequestParam("estado") String estado) {
 
-		return cidadeConverter.toArray(cidadeService.buscarPorEstado(estado));
+		return cidadeService.buscarPorEstado(estado);
 	}
 
-	@Operation(summary = "Cadastro de cidade", description = "Cadastrar uma nova cidade")
-	@ApiResponses(value = {
-
-			@ApiResponse(responseCode = "201", description = "Cidade cadastrada",
-
-					content = @Content(schema = @Schema(implementation = CidadeForm.class))),
-			@ApiResponse(responseCode = "400", description = "Algum parâmetro não foi informado", content = @Content(schema = @Schema(implementation = ErroDeFormularioDto.class))),
-
-			@ApiResponse(responseCode = "500", description = "Cidade já cadastrada", content = @Content(schema = @Schema(implementation = ErrorResponse.class))) })
+	@Operation(summary = CADASTRO_DE_UMA_CIDADE, description = CADASTRAR_UM_NOVA_CIDADE)
+	@DocumentacaoSwaggerCidade
 	@ResponseStatus(code = HttpStatus.CREATED)
 	@PostMapping
 	@Transactional
-	public CidadeDto cadastrarCidade(@RequestBody @Valid CidadeForm cidadeForm) {
-		return cidadeConverter.toOutPut(cidadeService.cadastrar(cidadeConverter.toEntity(cidadeForm)));
+	public CidadeDTO cadastrarCidade(@RequestBody @Valid CidadeForm cidadeForm) {
+		return cidadeService.cadastrar(cidadeForm);  
 	}
 
-	@Operation(summary = "Deletar cidade", description = "Apagar uma cidade no banco de dados")
-	@ApiResponses(value = {
-
-			@ApiResponse(responseCode = "200", description = "Cidade deletada com sucesso",
-
-					content = @Content(schema = @Schema(implementation = CidadeDto.class))),
-
-			@ApiResponse(responseCode = "404", description = "Não foi encontrada nenhuma cidade com essa nome") })
+	@Operation(summary = DELETAR_UMA_CIDADE, description = APAGA_UMA_CIDADE_DO_BANCO)
+	@DocumentacaoSwaggerCidade
 	@ResponseStatus(code = HttpStatus.OK)
 	@DeleteMapping
 	@Transactional

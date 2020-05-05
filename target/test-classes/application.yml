@@ -7,7 +7,7 @@ spring:
     password: 124578
   jpa:
     hibernate:
-     ddl-auto: none
+     ddl-auto: create
     show-sql: false
 
 ### Swagger

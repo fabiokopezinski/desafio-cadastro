@@ -1,126 +1,71 @@
 package br.com.raia.drogasil.cadastro.controller;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
-import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import br.com.raia.drogasil.cadastro.enumeration.SexoEnum;
-import br.com.raia.drogasil.cadastro.form.CidadeForm;
-import br.com.raia.drogasil.cadastro.form.ClienteAtualizarForm;
-import br.com.raia.drogasil.cadastro.form.ClienteForm;
-import br.com.raia.drogasil.cadastro.model.Cidade;
-import br.com.raia.drogasil.cadastro.model.Cliente;
-import br.com.raia.drogasil.cadastro.repository.CidadeRepository;
-import br.com.raia.drogasil.cadastro.repository.ClienteRepository;
+import br.com.raia.drogasil.cadastro.converter.Converter;
+import br.com.raia.drogasil.cadastro.domain.dto.ClienteDTO;
+import br.com.raia.drogasil.cadastro.domain.form.ClienteForm;
+import br.com.raia.drogasil.cadastro.domain.model.Cliente;
+import br.com.raia.drogasil.cadastro.domain.repository.CidadeRepository;
+import br.com.raia.drogasil.cadastro.domain.repository.ClienteRepository;
+import br.com.raia.drogasil.cadastro.scenario.ScenarioFactory;
+import br.com.raia.drogasil.cadastro.service.ClienteService;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-public class ClienteControllerTest { 
+public class ClienteControllerTest {
 
-	@Autowired
-	private MockMvc mockMvc;
+	@Rule
+	public ExpectedException thrown = ExpectedException.none();
 
-	@Autowired
-	private ObjectMapper objectMapper;
-
-	@Autowired
+	@MockBean
 	private CidadeRepository cidadeRepository;
 
-	@Autowired
+	@MockBean
 	private ClienteRepository clienteRepository;
 
-	private Cidade canoas;
+	@MockBean
+	private ClienteService clienteService;
 
-	private Cliente fabio;
-	private Cliente fabioCarvalho;
-	private ClienteAtualizarForm atualizarForm;
-	private ClienteForm clienteForm;
-	private ClienteForm clienteIdade;
-	private ClienteForm clienteJaExiste;
+	@Autowired
+	private ClienteController clienteController;
 
-	private CidadeForm cidadeForm;
+	@Autowired
+	private Converter<Cliente, ClienteDTO> conversorCliente;
+
+	@Autowired
+	private Converter<ClienteForm, ClienteDTO> conversorClienteForm;
+
+	private List<ClienteDTO> listarCliente = new ArrayList<ClienteDTO>();
 
 	@Before
 	public void antes() {
-		this.clienteRepository.deleteAll();
-		this.cidadeRepository.deleteAll();
 
-		canoas = new Cidade();
-		canoas.setNome("CANOAS");
-		canoas.setEstado("RIO GRANDE DO SUL");
+		this.cidadeRepository.save(ScenarioFactory.CIDADE_PORTO_ALEGRE);
+		this.cidadeRepository.save(ScenarioFactory.CIDADE_PASSO_FUNDO);
+		this.clienteRepository.save(ScenarioFactory.FABIO);
+		this.clienteRepository.save(ScenarioFactory.FABIOCARVALHO);
 
-		LocalDate dataNascimento=LocalDate.of(1993, 10, 21);
-		fabio = new Cliente();
-		fabio.setCidade(canoas);
-		fabio.setDataNascimento(dataNascimento);
-		fabio.setIdade(26);
-		fabio.setNome("FABIO");
-		fabio.setSobrenome("KOPEZINSKI");
-		fabio.setCidade(canoas);
-		fabio.setSexo(SexoEnum.MASCULINO);
-
-		fabioCarvalho = new Cliente();
-		fabioCarvalho.setCidade(canoas);
-		fabioCarvalho.setDataNascimento(dataNascimento);
-		fabioCarvalho.setIdade(26);
-		fabioCarvalho.setNome("FABIO");
-		fabioCarvalho.setSobrenome("CARVALHO");
-		fabioCarvalho.setCidade(canoas);
-		fabioCarvalho.setSexo(SexoEnum.MASCULINO);
-
-		this.cidadeRepository.save(canoas);
-		this.clienteRepository.save(fabio);
-		this.clienteRepository.save(fabioCarvalho);
-
-		atualizarForm=new ClienteAtualizarForm();
-		atualizarForm.setId(fabio.getId());
-		atualizarForm.setNome("SERGIO");
-		atualizarForm.setSobrenome("CARVALHO");
-		
-		cidadeForm = new CidadeForm();
-		cidadeForm.setEstado("RIO GRANDE DO SUL");
-		cidadeForm.setNome("CANOAS");
-
-		clienteForm = new ClienteForm();
-		clienteForm.setNome("FABIO");
-		clienteForm.setCidade(cidadeForm);
-		clienteForm.setDataNascimento(dataNascimento);
-		clienteForm.setSobrenome("CA");
-		clienteForm.setSexo(SexoEnum.MASCULINO);
-
-		clienteJaExiste = new ClienteForm();
-		clienteJaExiste.setNome("FABIO");
-		clienteJaExiste.setCidade(cidadeForm);
-		clienteJaExiste.setDataNascimento(dataNascimento);
-		clienteJaExiste.setSobrenome("CARVALHO");
-		clienteJaExiste.setSexo(SexoEnum.MASCULINO);
-
-		clienteIdade = new ClienteForm();
-		clienteIdade.setNome("FABIO");
-		clienteIdade.setCidade(cidadeForm);
-		clienteIdade.setDataNascimento(dataNascimento);
-		clienteIdade.setSobrenome("C");
-		clienteIdade.setSexo(SexoEnum.MASCULINO);
-
+		listarCliente.add(conversorCliente.toEntity(ScenarioFactory.FABIO, ClienteDTO.class));
+		listarCliente.add(conversorCliente.toEntity(ScenarioFactory.FABIOCARVALHO, ClienteDTO.class));
 	}
 
 	@After
@@ -132,85 +77,97 @@ public class ClienteControllerTest {
 
 	@Test
 	public void listarTodos() throws Exception {
-		mockMvc.perform(get("/clientes").accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
-				.andExpect(jsonPath("$.[0].nome").value(fabio.getNome()))
-				.andExpect(jsonPath("$.[0].sobrenome").value(fabio.getSobrenome()))
-				.andExpect(jsonPath("$.[1].nome").value(fabioCarvalho.getNome()))
-				.andExpect(jsonPath("$.[1].sobrenome").value(fabioCarvalho.getSobrenome()))
-				.andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+		when(clienteService.listarClientes()).thenReturn(listarCliente);
+		List<ClienteDTO> listaCliente = clienteController.listarClientes();
+		assertThat(listaCliente.get(0).getNome()).isEqualTo(ScenarioFactory.FABIO.getNome());
+		assertThat(listaCliente.get(0).getSobrenome()).isEqualTo(ScenarioFactory.FABIO.getSobrenome());
+		assertThat(listaCliente.get(0).getSexo()).isEqualTo(ScenarioFactory.FABIO.getSexo());
+		assertThat(listaCliente.get(0).getDataNascimento()).isEqualTo(ScenarioFactory.FABIO.getDataNascimento());
+		assertThat(listaCliente.get(0).getCidade().getNome()).isEqualTo(ScenarioFactory.FABIO.getCidade().getNome());
+		assertThat(listaCliente.get(0).getCidade().getEstado())
+				.isEqualTo(ScenarioFactory.FABIO.getCidade().getEstado());
+
+		assertThat(listaCliente.get(1).getNome()).isEqualTo(ScenarioFactory.FABIOCARVALHO.getNome());
+		assertThat(listaCliente.get(1).getSobrenome()).isEqualTo(ScenarioFactory.FABIOCARVALHO.getSobrenome());
+		assertThat(listaCliente.get(1).getSexo()).isEqualTo(ScenarioFactory.FABIOCARVALHO.getSexo());
+		assertThat(listaCliente.get(1).getDataNascimento())
+				.isEqualTo(ScenarioFactory.FABIOCARVALHO.getDataNascimento());
+		assertThat(listaCliente.get(1).getCidade().getNome())
+				.isEqualTo(ScenarioFactory.FABIOCARVALHO.getCidade().getNome());
+		assertThat(listaCliente.get(1).getCidade().getEstado())
+				.isEqualTo(ScenarioFactory.FABIO.getCidade().getEstado());
+
 	}
 
 	@Test
 	public void buscarPorIdSucesso() throws Exception {
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/clientes/" + fabio.getId()))
-				.andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+		when(clienteService.buscarPorId(ScenarioFactory.FABIO.getId()))
+				.thenReturn(conversorCliente.toEntity(ScenarioFactory.FABIO, ClienteDTO.class));
+		ClienteDTO cliente = clienteController.buscarPorId(ScenarioFactory.FABIO.getId());
+
+		assertThat(cliente.getNome()).isEqualTo(ScenarioFactory.FABIO.getNome());
+		assertThat(cliente.getSobrenome()).isEqualTo(ScenarioFactory.FABIO.getSobrenome());
+		assertThat(cliente.getSexo()).isEqualTo(ScenarioFactory.FABIO.getSexo());
+		assertThat(cliente.getDataNascimento()).isEqualTo(ScenarioFactory.FABIO.getDataNascimento());
+		assertThat(cliente.getCidade().getNome()).isEqualTo(ScenarioFactory.FABIO.getCidade().getNome());
+		assertThat(cliente.getCidade().getEstado()).isEqualTo(ScenarioFactory.FABIO.getCidade().getEstado());
 	}
 
 	@Test
-	public void buscarPorIdErro() throws Exception {
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/clientes/100"))
-				.andExpect(MockMvcResultMatchers.status().isNotFound()).andReturn();
-	}
-
-	@Test
-	public void cadastrarUmClienteComSucesso() throws JsonProcessingException, Exception {
-		mockMvc.perform(MockMvcRequestBuilders.post("/clientes").content(objectMapper.writeValueAsBytes(clienteForm))
-				.accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON))
-				.andExpect(MockMvcResultMatchers.status().isCreated()).andReturn();
-	}
-
-
-	@Test
-	public void cadastrarUmClienteJaExistente() throws JsonProcessingException, Exception {
-		mockMvc.perform(MockMvcRequestBuilders.post("/clientes").content(objectMapper.writeValueAsBytes(clienteJaExiste))
-				.accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON))
-				.andExpect(MockMvcResultMatchers.status().isBadRequest()).andReturn();
-	}
-
-	@Test
-	public void buscarPorNomeSucesso() throws Exception {
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/clientes/nome").param("nome", fabio.getNome()))
-		.andExpect(jsonPath("$.[0].nome").value(fabio.getNome()))
-		.andExpect(jsonPath("$.[0].sobrenome").value(fabio.getSobrenome()))
-		.andExpect(jsonPath("$.[1].nome").value(fabioCarvalho.getNome()))
-		.andExpect(jsonPath("$.[1].sobrenome").value(fabioCarvalho.getSobrenome()))
-		.andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
-	}
-	
-	@Test
-	public void buscarPorNomeErro() throws Exception {
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/cliente/nome").param("nome", "Fá"))
-		.andExpect(MockMvcResultMatchers.status().isNotFound()).andReturn(); 
+	public void cadastrarUmClienteComSucesso() throws Exception {
+		when(clienteService.cadastrar(ScenarioFactory.CLIENTE_NOVO_FULANO))
+				.thenReturn(conversorClienteForm.toEntity(ScenarioFactory.CLIENTE_NOVO_FULANO, ClienteDTO.class));
+		ClienteDTO cliente = clienteController.cadastrar(ScenarioFactory.CLIENTE_NOVO_FULANO);
+		assertThat(cliente.getNome()).isEqualTo(ScenarioFactory.CLIENTE_NOVO_FULANO.getNome());
+		assertThat(cliente.getSobrenome()).isEqualTo(ScenarioFactory.CLIENTE_NOVO_FULANO.getSobrenome());
+		assertThat(cliente.getSexo()).isEqualTo(ScenarioFactory.CLIENTE_NOVO_FULANO.getSexo());
+		assertThat(cliente.getDataNascimento()).isEqualTo(ScenarioFactory.CLIENTE_NOVO_FULANO.getDataNascimento());
+		assertThat(cliente.getCidade().getNome()).isEqualTo(ScenarioFactory.CLIENTE_NOVO_FULANO.getCidade().getNome());
+		assertThat(cliente.getCidade().getEstado())
+				.isEqualTo(ScenarioFactory.CLIENTE_NOVO_FULANO.getCidade().getEstado());
 	}
 
 	@Test
 	public void buscarPorNomeCompletoSucesso() throws Exception {
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/clientes/nomecompleto").param("nome", "FABIO").param("sobrenome", "KOPEZINSKI"))
-		.andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+		when(clienteService.buscarNomeESobrenome(ScenarioFactory.FABIO.getNome(), ScenarioFactory.FABIO.getSobrenome()))
+				.thenReturn(conversorCliente.toEntity(ScenarioFactory.FABIO, ClienteDTO.class));
+		ClienteDTO cliente = clienteController.buscarPorNomeCompleto(ScenarioFactory.FABIO.getNome(),
+				ScenarioFactory.FABIO.getSobrenome());
+		assertThat(cliente.getNome()).isEqualTo(ScenarioFactory.FABIO.getNome());
+		assertThat(cliente.getSobrenome()).isEqualTo(ScenarioFactory.FABIO.getSobrenome());
+		assertThat(cliente.getSexo()).isEqualTo(ScenarioFactory.FABIO.getSexo());
+		assertThat(cliente.getDataNascimento()).isEqualTo(ScenarioFactory.FABIO.getDataNascimento());
+		assertThat(cliente.getCidade().getNome()).isEqualTo(ScenarioFactory.FABIO.getCidade().getNome());
+		assertThat(cliente.getCidade().getEstado()).isEqualTo(ScenarioFactory.FABIO.getCidade().getEstado());
 	}
+
 	@Test
-	public void buscarPorNomeCompletoErro() throws Exception {
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/clientes/nomecompleto").param("nome", "FABIOJ").param("sobrenome", "G"))
-		.andExpect(MockMvcResultMatchers.status().isNotFound()).andReturn();
+	public void buscarPorNomeSucesso() throws Exception {
+		when(clienteService.buscarPorNome(ScenarioFactory.FABIO.getNome())).thenReturn(listarCliente);
+		List<ClienteDTO> listaCliente = clienteController.buscarPorNome(ScenarioFactory.FABIO.getNome());
+		assertThat(listaCliente.get(0).getNome()).isEqualTo(ScenarioFactory.FABIO.getNome());
+		assertThat(listaCliente.get(0).getSobrenome()).isEqualTo(ScenarioFactory.FABIO.getSobrenome());
+		assertThat(listaCliente.get(0).getSexo()).isEqualTo(ScenarioFactory.FABIO.getSexo());
+		assertThat(listaCliente.get(0).getDataNascimento()).isEqualTo(ScenarioFactory.FABIO.getDataNascimento());
+		assertThat(listaCliente.get(0).getCidade().getNome()).isEqualTo(ScenarioFactory.FABIO.getCidade().getNome());
+		assertThat(listaCliente.get(0).getCidade().getEstado())
+				.isEqualTo(ScenarioFactory.FABIO.getCidade().getEstado());
 	}
-	
 
 	@Test
 	public void deletarClienteComSucesso() throws Exception {
-		this.mockMvc.perform(MockMvcRequestBuilders.delete("/clientes").param("nome",fabio.getNome()).param("sobrenome", fabio.getSobrenome()))
-		.andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+		when(clienteService.deletar(ScenarioFactory.FABIO.getNome(), ScenarioFactory.FABIO.getSobrenome()))
+				.thenReturn(ScenarioFactory.DELETAR);
+		String delete = clienteController.deletarCliente(ScenarioFactory.FABIO.getNome(),
+				ScenarioFactory.FABIO.getSobrenome());
+		assertEquals(ScenarioFactory.DELETAR, delete);
 	}
-	
+
 	@Test
 	public void deletarClienteSemSucesso() throws Exception {
-		this.mockMvc.perform(MockMvcRequestBuilders.delete("/clientes").param("nome","KAKA").param("sobrenome", "KA"))
-		.andExpect(MockMvcResultMatchers.status().isNotFound()).andReturn();
+		when(clienteService.deletar("FULANO", "TAL")).thenReturn(ScenarioFactory.NAO_FOI_ENCONTRADO);
+		String delete = clienteController.deletarCliente("FULANO", "TAL");
+		assertEquals(ScenarioFactory.NAO_FOI_ENCONTRADO, delete);
 	}
-	
-	
-	
-	
-	
-	
 
 }

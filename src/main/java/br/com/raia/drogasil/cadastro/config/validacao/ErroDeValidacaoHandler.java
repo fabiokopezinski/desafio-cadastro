@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import br.com.raia.drogasil.cadastro.domain.enumeration.HttpEnum;
+
 @RestControllerAdvice
 public class ErroDeValidacaoHandler { 
 
@@ -38,13 +40,13 @@ public class ErroDeValidacaoHandler {
 	@ExceptionHandler(ResourceNotFoundException.class)
 	public ErrorResponse handler(ResourceNotFoundException e) {
 		 String details=e.getLocalizedMessage();
-		 return new ErrorResponse("NOT FOUND",details);
+		 return new ErrorResponse(HttpEnum.NOT_FOUND.toString(),details);
 	} 
 	@ResponseStatus(code = HttpStatus.BAD_REQUEST)
 	@ExceptionHandler(BusinessException.class)
 	public ErrorResponse handler(BusinessException e) {
 		 String details=e.getLocalizedMessage();
-		 return new ErrorResponse("BAD REQUEST",details);
+		 return new ErrorResponse(HttpEnum.BAD_REQUEST.toString(),details);
 	}
 
 }

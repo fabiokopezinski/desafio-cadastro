@@ -1,12 +1,14 @@
 package br.com.raia.drogasil.cadastro.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -19,106 +21,87 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import br.com.raia.drogasil.cadastro.config.validacao.ResourceNotFoundException;
-import br.com.raia.drogasil.cadastro.model.Cidade;
-import br.com.raia.drogasil.cadastro.repository.CidadeRepository;
-import br.com.raia.drogasil.cadastro.service.CidadeService;
+import br.com.raia.drogasil.cadastro.domain.dto.CidadeDTO;
+import br.com.raia.drogasil.cadastro.domain.model.Cidade;
+import br.com.raia.drogasil.cadastro.domain.repository.CidadeRepository;
+import br.com.raia.drogasil.cadastro.scenario.ScenarioFactory;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-public class CidadeServiceTeste {   
+public class CidadeServiceTeste {
 
 	@MockBean
 	private CidadeRepository cidadeRepository;
-	
+
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
-	
+
 	@Autowired
 	private CidadeService cidadeService;
-	
-	private List<Cidade> listaCidades= new ArrayList<Cidade>();
-	
-	private Cidade portoAlegre;
-	private Cidade passoFundo;
-	
-	private Cidade pelotas;
-	
+
+	private List<Cidade> listaCidades = new ArrayList<Cidade>();
+
 	@Before
 	public void antes() {
-		
-		portoAlegre=new Cidade();
-		portoAlegre.setNome("PORTO ALEGRE");
-		portoAlegre.setEstado("RIO GRANDE DO SUL");
-		
-		passoFundo=new Cidade();
-		passoFundo.setNome("PASSO FUNDO");
-		passoFundo.setEstado("RIO GRANDE DO SUL");
-		
-		pelotas=new Cidade();
-		pelotas.setId(250);
-		pelotas.setNome("PELOTAS");
-		pelotas.setEstado("RIO GRANDE DO SUL");
-		
-		listaCidades.add(portoAlegre);
-		listaCidades.add(passoFundo);
-		
-		cidadeRepository.save(portoAlegre);
-		cidadeRepository.save(passoFundo);
 
-		
+		this.cidadeRepository.save(ScenarioFactory.CIDADE_PORTO_ALEGRE);
+		this.cidadeRepository.save(ScenarioFactory.CIDADE_PASSO_FUNDO);
+
+		listaCidades.add(ScenarioFactory.CIDADE_PORTO_ALEGRE);
+		listaCidades.add(ScenarioFactory.CIDADE_PASSO_FUNDO);
 	}
-	
+
+	@After
+	public void depois() {
+		this.cidadeRepository.deleteAll();
+	}
+
 	@Test
 	public void listaDeCidades() {
 		when(cidadeRepository.findAll()).thenReturn(listaCidades);
-		List<Cidade> listaCidadeService= cidadeService.listaDeCidades();
-		assertThat(listaCidadeService.get(0).getNome()).isEqualTo("PORTO ALEGRE");
-		assertThat(listaCidadeService.get(1).getNome()).isEqualTo("PASSO FUNDO");
+		List<CidadeDTO> listaCidadeService = cidadeService.listaDeCidades();
+		assertThat(listaCidadeService.get(0).getNome()).isEqualTo(ScenarioFactory.CIDADE_PORTO_ALEGRE.getNome());
+		assertThat(listaCidadeService.get(0).getEstado()).isEqualTo(ScenarioFactory.CIDADE_PORTO_ALEGRE.getEstado());
+		assertThat(listaCidadeService.get(1).getNome()).isEqualTo(ScenarioFactory.CIDADE_PASSO_FUNDO.getNome());
+		assertThat(listaCidadeService.get(1).getEstado()).isEqualTo(ScenarioFactory.CIDADE_PASSO_FUNDO.getEstado());
+
 	}
-	
-		
-	
+
 	@Test
 	public void buscarPorNomeComSucesso() {
-		Optional<Cidade> cidade= Optional.empty();
-		cidade=Optional.of(portoAlegre);
-		when(cidadeRepository.findByNome("PORTO ALEGRE")).thenReturn(cidade);
-		Cidade novaCidade= cidadeService.buscarPorCidade(portoAlegre.getNome());
-		assertThat(novaCidade.getNome()).isEqualTo("PORTO ALEGRE"); 
+		Optional<Cidade> cidade = Optional.empty();
+		cidade = Optional.of(ScenarioFactory.CIDADE_PORTO_ALEGRE);
+		when(cidadeRepository.findByNome(ScenarioFactory.PORTO_ALEGRE)).thenReturn(cidade);
+		CidadeDTO novaCidade = cidadeService.buscarPorCidade(ScenarioFactory.PORTO_ALEGRE);
+		assertThat(novaCidade.getNome()).isEqualTo(ScenarioFactory.PORTO_ALEGRE);
 	}
-	
+
 	@Test
 	public void buscarPorNomeSemSucesso() throws Exception {
-		thrown.expect(ResourceNotFoundException.class);
-		thrown.expectMessage("Nome da cidade não encontrada");
-		cidadeService.buscarPorCidade("PELOTAS");
-		
+
+		assertThrows(ResourceNotFoundException.class, () -> cidadeService.buscarPorEstado(ScenarioFactory.PELOTAS));
+
 	}
-	
+
 	@Test
 	public void buscarPorEstadoComSucesso() throws Exception {
-		
-		when(cidadeRepository.findByEstado("RIO GRANDE DO SUL")).thenReturn(listaCidades);
-		List<Cidade>novaListaCidades= cidadeService.buscarPorEstado("RIO GRANDE DO SUL");
-		assertThat(novaListaCidades.get(0).getEstado()).isEqualTo("RIO GRANDE DO SUL");
-		assertThat(novaListaCidades.get(1).getEstado()).isEqualTo("RIO GRANDE DO SUL"); 
-	} 
-	
+		Optional<List<Cidade>> cidade = Optional.empty();
+		cidade = Optional.of(listaCidades);
+		when(cidadeRepository.findByEstado(ScenarioFactory.RIO_GRANDE_DO_SUL)).thenReturn(cidade);
+		List<CidadeDTO> novaListaCidades = cidadeService.buscarPorEstado(ScenarioFactory.RIO_GRANDE_DO_SUL);
+		assertThat(novaListaCidades.get(0).getEstado()).isEqualTo(ScenarioFactory.RIO_GRANDE_DO_SUL);
+		assertThat(novaListaCidades.get(1).getEstado()).isEqualTo(ScenarioFactory.RIO_GRANDE_DO_SUL);
+	}
+
 	@Test
 	public void buscarPorEstadoSemSucesso() throws Exception {
-		thrown.expect(ResourceNotFoundException.class);
-		thrown.expectMessage("Não achou nenhum estado");
-		cidadeService.buscarPorEstado("SAO PAULO");   
-	} 
-	
-	@Test
-	public void deletarErro() throws Exception
-	{
-		thrown.expect(ResourceNotFoundException.class);
-		thrown.expectMessage("Não foi encontrado"); 
-		cidadeService.deletar("SAO PAULO");   
+		assertThrows(ResourceNotFoundException.class, ()->cidadeService.buscarPorCidade(ScenarioFactory.SAO_PAULO)); 
 	}
-		
-	
+
+	@Test
+	public void deletarErro() throws Exception {
+		assertThrows(ResourceNotFoundException.class, ()->cidadeService.buscarPorCidade(ScenarioFactory.SAO_PAULO)); 
+	}
+
 }
