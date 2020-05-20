@@ -1,13 +1,12 @@
 package br.com.raia.drogasil.cadastro.service;
 
-import java.time.LocalDate;
-import java.time.Period;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import br.com.raia.drogasil.cadastro.annotation.Constantes;
 import br.com.raia.drogasil.cadastro.config.validacao.BusinessException;
 import br.com.raia.drogasil.cadastro.config.validacao.ResourceNotFoundException;
 import br.com.raia.drogasil.cadastro.converter.Converter;
@@ -34,20 +33,11 @@ public class ClienteService {
 	@Autowired
 	private Converter<ClienteAtualizarForm, Cliente> conversorAtualizar;
 
-	private final String CLIENTES_NAO_FORAM_ENCONTRADOS = "Clientes com esse nome não foram encontrados";
-	private final String CLIENTE_NAO_FOI_ENCONTRADO = "Cliente não foi encontrado"; 
-	private final String NAO_ACHOU = "Não achou o ID informado";
-
-	private final String JA_FOI_REGISTRADO = "Cliente já foi cadastrado";
-	private final String JA_EXISTE = "Já existe alguém com esse nome";
-	private final String DELETADO_COM_SUCESSO="Deletado com sucesso";
-	private final String NAO_FOI_ENCONTRADO = "Não foi encontrado";
-
 	@Autowired
 	private CidadeRepository cidadeRepository;
 
 	public List<ClienteDTO> listarClientes() {
-		return conversorCliente.toArray(clienteRepository.findAll(), ClienteDTO.class);
+		return conversorCliente.toArray((List<Cliente>) clienteRepository.findAll(), ClienteDTO.class);
 	}
 
 	public ClienteDTO buscarNomeESobrenome(String nome, String sobreNome) {
@@ -55,13 +45,13 @@ public class ClienteService {
 		return conversorCliente
 				.toOutPut(
 						clienteRepository.findByNomeAndSobrenome(nome.toUpperCase(), sobreNome.toUpperCase())
-								.orElseThrow(() -> new ResourceNotFoundException(CLIENTE_NAO_FOI_ENCONTRADO)),
+								.orElseThrow(() -> new ResourceNotFoundException(Constantes.CLIENTE_NAO_FOI_ENCONTRADO)),
 						ClienteDTO.class);
 	}
 
 	public List<ClienteDTO> buscarPorNome(String nome) {
 		return conversorCliente.toArray(clienteRepository.findByNome(nome.toUpperCase())
-				.orElseThrow(() -> new ResourceNotFoundException(CLIENTES_NAO_FORAM_ENCONTRADOS)), ClienteDTO.class);
+				.orElseThrow(() -> new ResourceNotFoundException(Constantes.CLIENTES_NAO_FORAM_ENCONTRADOS)), ClienteDTO.class);
 
 	}
 
@@ -73,27 +63,21 @@ public class ClienteService {
 			Cliente cliente = conversorForm.toEntity(clienteForm, Cliente.class);
 			cliente.setNome(clienteForm.getNome().toUpperCase());
 			cliente.setSobrenome(clienteForm.getSobrenome().toUpperCase());
-			cliente.setIdade(calcularIdade(cliente.getDataNascimento()));
 			cliente.setCidade(buscarCidade(clienteForm));
 			return conversorCliente.toOutPut(clienteRepository.save(cliente), ClienteDTO.class);
 
 		} else {
 
-			throw new BusinessException(JA_FOI_REGISTRADO);
+			throw new BusinessException(Constantes.JA_FOI_REGISTRADO);
 		}
 	}
 
 	private Cidade buscarCidade(ClienteForm clienteForm) {
 
 		return cidadeRepository.findByNome(clienteForm.getCidade().getNome().toUpperCase())
-				.orElseThrow(() -> new ResourceNotFoundException(NAO_FOI_ENCONTRADO));
+				.orElseThrow(() -> new ResourceNotFoundException(Constantes.NAO_FOI_ENCONTRADO));
 	}
 
-	private Integer calcularIdade(LocalDate dataNascimento) {
-		LocalDate hoje = LocalDate.now();
-		Period idade = dataNascimento.until(hoje);
-		return idade.getYears();
-	}
 
 	public ClienteDTO atualizarCliente(ClienteAtualizarForm clienteAtualizarForm) {
 		Cliente cliente = conversorAtualizar.toEntity(clienteAtualizarForm, Cliente.class); 
@@ -103,17 +87,23 @@ public class ClienteService {
 		if (present && !buscarNome.isPresent()) {
 			cliente.setNome(clienteAtualizarForm.getNome().toUpperCase());
 			cliente.setSobrenome(clienteAtualizarForm.getSobrenome().toUpperCase());
-			Cliente novoCliente = clienteRepository.getOne(cliente.getId());
-			novoCliente.setNome(cliente.getNome());
-			novoCliente.setSobrenome(cliente.getSobrenome());
-			return conversorCliente.toOutPut(novoCliente, ClienteDTO.class);
+			Optional<Cliente> novoCliente = clienteRepository.findById(cliente.getId());
+			novoCliente.get().setNome(cliente.getNome());
+			novoCliente.get().setSobrenome(cliente.getSobrenome());
+			return conversorCliente.toOutPut(novoCliente.get(), ClienteDTO.class);
 		}
-		throw new BusinessException(JA_EXISTE);
+		else if (!present) {
+			throw new ResourceNotFoundException(Constantes.CLIENTE_NAO_FOI_ENCONTRADO);
+		}
+		else {
+			throw new BusinessException(Constantes.JA_EXISTE); 
+		}
+		
 	}
 
 	public ClienteDTO buscarPorId(Integer id) {
 		return conversorCliente.toOutPut(
-				clienteRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(NAO_ACHOU)),
+				clienteRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(Constantes.NAO_ACHOU)),
 				ClienteDTO.class); 
 	}
 
@@ -123,9 +113,9 @@ public class ClienteService {
 				sobrenome.toUpperCase());
 		if (deletarCliente.isPresent()) {
 			clienteRepository.deleteById(deletarCliente.get().getId());
-			return DELETADO_COM_SUCESSO;
+			return Constantes.DELETAR;
 		}
-		throw new ResourceNotFoundException(NAO_FOI_ENCONTRADO);
+		throw new ResourceNotFoundException(Constantes.NAO_FOI_ENCONTRADO);
 
 	}
 

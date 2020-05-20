@@ -45,8 +45,9 @@ public class ClienteRepositoryTest {
 
 	@After
 	public void depois() {
-		this.clienteRepository.deleteAll();
 		this.cidadeRepository.deleteAll();
+		this.clienteRepository.deleteAll();
+		
 
 	}
 

@@ -1,6 +1,7 @@
 package br.com.raia.drogasil.cadastro.domain.model;
 
 import java.time.LocalDate;
+import java.time.Period;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,6 +12,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.PrePersist;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
@@ -27,7 +29,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor 
 @Entity
 @Table(name = "CLIENTE")
 @ToString
@@ -49,5 +51,12 @@ public class Cliente {
 	@JoinColumn(name = "cidade_id")
 	@NotNull(message = "Por favor, inserir um endereço")
 	private Cidade cidade;
+	
+	@PrePersist
+	public void setarNascimento() {
+		LocalDate hoje = LocalDate.now();
+		Period idadePeriod=dataNascimento.until(hoje);
+		idade=idadePeriod.getYears();
+	}
 
 }

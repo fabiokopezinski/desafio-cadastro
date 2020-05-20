@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import br.com.raia.drogasil.cadastro.annotation.Constantes;
 import br.com.raia.drogasil.cadastro.config.validacao.BusinessException;
 import br.com.raia.drogasil.cadastro.config.validacao.ResourceNotFoundException;
 import br.com.raia.drogasil.cadastro.converter.Converter;
@@ -23,30 +24,25 @@ public class CidadeService {
 	@Autowired
 	private Converter<CidadeForm,Cidade> conversorCidadeForm;
 
-	private final String NAO_ACHOU_NENHUM_ESTADO = "Não achou nenhum estado";
-	private final String JA_FOI_CADASTRO = "Ja foi cadastrado";
-	private final String DELETAR = "Deletada com sucesso";
-	private final String NAO_FOI_ENCONTRADO = "Não foi encontrado";
-
 	@Autowired
 	private CidadeRepository cidadeRepository;
 
 	public List<CidadeDTO> listaDeCidades() {
 
-		return conversorCidade.toArray(cidadeRepository.findAll(), CidadeDTO.class);
+		return conversorCidade.toArray((List<Cidade>) cidadeRepository.findAll(), CidadeDTO.class);
 	}
 
 	public List<CidadeDTO> buscarPorEstado(String estado) {
 
 		return conversorCidade.toArray(cidadeRepository.findByEstado(estado.toUpperCase())
-				.orElseThrow(() -> new ResourceNotFoundException(NAO_ACHOU_NENHUM_ESTADO)), CidadeDTO.class);
+				.orElseThrow(() -> new ResourceNotFoundException(Constantes.NAO_ACHOU_NENHUM_ESTADO)), CidadeDTO.class);
 
 	}
 
 	public CidadeDTO buscarPorCidade(String nome) {
 
 		return conversorCidade.toOutPut(cidadeRepository.findByNome(nome.toUpperCase())
-				.orElseThrow(() -> new ResourceNotFoundException(NAO_FOI_ENCONTRADO)), CidadeDTO.class);
+				.orElseThrow(() -> new ResourceNotFoundException(Constantes.NAO_FOI_ENCONTRADO)), CidadeDTO.class);
  
 	}
 
@@ -61,7 +57,7 @@ public class CidadeService {
 			return conversorCidade.toOutPut(cidadeRepository.save(conversorCidadeForm.toEntity(cidade, Cidade.class)),CidadeDTO.class);
 		}
 
-		throw new BusinessException(JA_FOI_CADASTRO); 
+		throw new BusinessException(Constantes.JA_FOI_CADASTRO); 
 
 	}
 
@@ -70,9 +66,9 @@ public class CidadeService {
 		Optional<Cidade> deletarCidade = cidadeRepository.findByNome(nome.toUpperCase());
 		if (deletarCidade.isPresent()) {
 			cidadeRepository.deleteById(deletarCidade.get().getId()); 
-			return DELETAR;
+			return Constantes.DELETAR;
 		}
-		throw new ResourceNotFoundException(NAO_FOI_ENCONTRADO);
+		throw new ResourceNotFoundException(Constantes.NAO_FOI_ENCONTRADO);
 
 	}
 

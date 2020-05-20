@@ -69,7 +69,7 @@ public class CidadeServiceTeste {
 	}
 
 	@Test
-	public void buscarPorNomeComSucesso() {
+	public void buscarPorCidade_QuandoEstiverOk_EntaoReceboOk() {
 		Optional<Cidade> cidade = Optional.empty();
 		cidade = Optional.of(ScenarioFactory.CIDADE_PORTO_ALEGRE);
 		when(cidadeRepository.findByNome(ScenarioFactory.PORTO_ALEGRE)).thenReturn(cidade);
@@ -78,14 +78,14 @@ public class CidadeServiceTeste {
 	}
 
 	@Test
-	public void buscarPorNomeSemSucesso() throws Exception {
+	public void buscarPorNome_QuandoNaoAchar_EntaoReceboResourceNotFoundException() throws Exception {
 
 		assertThrows(ResourceNotFoundException.class, () -> cidadeService.buscarPorEstado(ScenarioFactory.PELOTAS));
 
 	}
 
 	@Test
-	public void buscarPorEstadoComSucesso() throws Exception {
+	public void buscarPorEstado_QuandoEstiverOk_EntaoReceboOk() throws Exception {
 		Optional<List<Cidade>> cidade = Optional.empty();
 		cidade = Optional.of(listaCidades);
 		when(cidadeRepository.findByEstado(ScenarioFactory.RIO_GRANDE_DO_SUL)).thenReturn(cidade);
@@ -95,12 +95,12 @@ public class CidadeServiceTeste {
 	}
 
 	@Test
-	public void buscarPorEstadoSemSucesso() throws Exception {
+	public void buscarPorEstado_QuandoNaoAchar_EntaoReceboResourceNotFoundException() throws Exception {
 		assertThrows(ResourceNotFoundException.class, ()->cidadeService.buscarPorCidade(ScenarioFactory.SAO_PAULO)); 
 	}
 
 	@Test
-	public void deletarErro() throws Exception {
+	public void deletar_QuandoNaoAchar_EntaoReceboResourceNotFoundException() throws Exception {
 		assertThrows(ResourceNotFoundException.class, ()->cidadeService.buscarPorCidade(ScenarioFactory.SAO_PAULO)); 
 	}
 

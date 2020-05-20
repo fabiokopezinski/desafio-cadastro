@@ -1,35 +1,23 @@
 package br.com.raia.drogasil.cadastro.steps;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
-import br.com.raia.drogasil.cadastro.config.validacao.BusinessException;
-import br.com.raia.drogasil.cadastro.config.validacao.ResourceNotFoundException;
-import br.com.raia.drogasil.cadastro.controller.CidadeController;
-import br.com.raia.drogasil.cadastro.controller.ClienteController;
-import br.com.raia.drogasil.cadastro.converter.Converter;
 import br.com.raia.drogasil.cadastro.domain.dto.ClienteDTO;
-import br.com.raia.drogasil.cadastro.domain.form.CidadeForm;
-import br.com.raia.drogasil.cadastro.domain.form.ClienteForm;
 import br.com.raia.drogasil.cadastro.domain.repository.CidadeRepository;
 import br.com.raia.drogasil.cadastro.domain.repository.ClienteRepository;
+import br.com.raia.drogasil.cadastro.featurebase.FeatureBase;
 import br.com.raia.drogasil.cadastro.scenario.ScenarioFactory;
-import br.com.raia.drogasil.cadastro.service.ClienteService;
-import cucumber.api.java.After;
-import cucumber.api.java.Before;
 import cucumber.api.java.pt.Dado;
 import cucumber.api.java.pt.Então;
+import cucumber.api.java.pt.Quando;
 
-public class ClienteControllerSteps {
-
-	@Autowired
-	private CidadeController cidadeController;
+public class ClienteControllerSteps extends FeatureBase {
 
 	@Autowired
 	private CidadeRepository cidadeRepository;
@@ -37,142 +25,96 @@ public class ClienteControllerSteps {
 	@Autowired
 	private ClienteRepository clienteRepository;
 
-	@Autowired
-	private ClienteService clienteService;
+	ResponseEntity<List<ClienteDTO>> listaEntityCliente;
+	ResponseEntity<ClienteDTO> entityCliente;
+	Integer httpCodeStatusExpected;
+	String nome;
+	String sobrenome;
 
-	@Autowired
-	private ClienteController clienteController;
-
-	private List<ClienteDTO> listaDeClientes = new ArrayList<ClienteDTO>();
-
-	@Autowired
-	private Converter<ClienteForm, ClienteDTO> conversorCliente;
-
-	private ClienteDTO cliente = new ClienteDTO();
-
-	private String status;
-
-	private Integer id;
-
-	@Before
-	public void antes() {
-
-		this.cidadeController.cadastrarCidade(ScenarioFactory.CIDADE_Form);
-		cliente = clienteService.cadastrar(ScenarioFactory.CLIENTE_NOVO_FULANO);
-		this.clienteService.cadastrar(ScenarioFactory.CLIENTE_NOVO_BELTRANO);
-		id = cliente.getId();
-		listaDeClientes.add(conversorCliente.toEntity(ScenarioFactory.CLIENTE_NOVO_FULANO, ClienteDTO.class));
-		listaDeClientes.add(conversorCliente.toEntity(ScenarioFactory.CLIENTE_NOVO_BELTRANO, ClienteDTO.class));
-
-	}
-
-	@After
-	public void depois() {
+	@Dado("que eu devo listar uma lista de clientes cadastrado")
+	public void listarClientes_DadoQueEuDevoListarUmaListaDeClientesCadastrado() {
 		this.clienteRepository.deleteAll();
 		this.cidadeRepository.deleteAll();
-	}
-
-	@Então("dado um chamado para o listarCliente, entao eu recebo uma lista")
-	public void dadoUmChamadoParaOListarClienteEntaoEuReceboUmaLista() {
-		assertEquals(listaDeClientes.get(0).getNome(), clienteController.listarClientes().get(0).getNome());
-		assertEquals(listaDeClientes.get(0).getSobrenome(), clienteController.listarClientes().get(0).getSobrenome());
-
-		assertEquals(listaDeClientes.get(1).getNome(), clienteController.listarClientes().get(1).getNome());
-		assertEquals(listaDeClientes.get(1).getSobrenome(), clienteController.listarClientes().get(1).getSobrenome());
+		this.cidadeRepository.save(ScenarioFactory.RIO_GRANDE);
+		ScenarioFactory.BELTRANO.setCidade(ScenarioFactory.RIO_GRANDE);
+		this.clienteRepository.save(ScenarioFactory.BELTRANO);
 
 	}
 
-	@Dado("um nome,sobrenome,data de nascimento,sexo e cidade onde mora")
-	public void umNomeSobrenomeDataDeNascimentoSexoECidadeOndeMora() {
-		ScenarioFactory.NOVO_CLIENTE.setCidade(new CidadeForm("PORTO ALEGRE", "RIO GRANDE DO SUL"));
-		cliente = clienteController.cadastrar(ScenarioFactory.NOVO_CLIENTE);
+	@Quando("eu realizo uma chamada")
+	public void listarClientes_QuandoEuRealizoUmaChamada() {
+		listaEntityCliente = listarClientes();
+		this.httpCodeStatusExpected = HttpStatus.OK.value();
+	}
+
+	@Então("recebo uma lista de clientes")
+	public void listarClientes_EntaoReceboUmaListaDeClientes() {
+		assertEquals(listaEntityCliente.getBody().get(0).getNome(), ScenarioFactory.BELTRANO.getNome());
+		assertEquals(listaEntityCliente.getBody().get(0).getSobrenome(), ScenarioFactory.BELTRANO.getSobrenome());
+		assertEquals(listaEntityCliente.getBody().get(0).getDataNascimento(),
+				ScenarioFactory.BELTRANO.getDataNascimento());
+		assertEquals(listaEntityCliente.getBody().get(0).getCidade().getNome(),
+				ScenarioFactory.BELTRANO.getCidade().getNome());
+		assertEquals(listaEntityCliente.getBody().get(0).getCidade().getEstado(),
+				ScenarioFactory.BELTRANO.getCidade().getEstado());
+		assertEquals(listaEntityCliente.getBody().get(0).getSexo(), ScenarioFactory.BELTRANO.getSexo());
+	}
+
+	@Então("recebo o status da lista cliente {int}")
+	public void listarClientes_EntaoReceboOStatusDaListaCliente(Integer int1) {
+		assertEquals(listaEntityCliente.getStatusCode().value(), httpCodeStatusExpected);
+	}
+
+	@Dado("um cliente para cadastrar")
+	public void cadastrar_DadoUmClienteParaCadastrar() {
+		this.cidadeRepository.save(ScenarioFactory.RIO_GRANDE);
+		ScenarioFactory.CLIENTE_NOVO_FULANO.setCidade(ScenarioFactory.RIO_GRANDE_Form);
+		entityCliente = cadastrar(ScenarioFactory.CLIENTE_NOVO_FULANO);
+	}
+
+	@Então("cadastro um cliente")
+	public void cadastrar_EntaoCadastroUmCliente() {
+		assertEquals(entityCliente.getBody().getNome(), ScenarioFactory.CLIENTE_NOVO_FULANO.getNome());
+		assertEquals(entityCliente.getBody().getSobrenome(), ScenarioFactory.CLIENTE_NOVO_FULANO.getSobrenome());
+		assertEquals(entityCliente.getBody().getDataNascimento(),
+				ScenarioFactory.CLIENTE_NOVO_FULANO.getDataNascimento());
+		assertEquals(entityCliente.getBody().getCidade().getNome(),
+				ScenarioFactory.CLIENTE_NOVO_FULANO.getCidade().getNome());
+		assertEquals(entityCliente.getBody().getCidade().getEstado(),
+				ScenarioFactory.CLIENTE_NOVO_FULANO.getCidade().getEstado());
+		assertEquals(entityCliente.getBody().getSexo(), ScenarioFactory.CLIENTE_NOVO_FULANO.getSexo());
+		this.httpCodeStatusExpected = HttpStatus.CREATED.value();
+	}
+
+	@Então("recebo o status do cliente {int}")
+	public void cadastrar_EntaoReceboOStatusDoCliente(Integer int1) {
+		assertEquals(httpCodeStatusExpected, entityCliente.getStatusCode().value());
+	}
+
+	@Dado("um cliente com nome e sobrenome")
+	public void buscarPorNomeCompleto_QuandoUmClienteComNomeESobrenome() {
+		this.clienteRepository.deleteAll();
+		this.cidadeRepository.deleteAll();
+		this.cidadeRepository.save(ScenarioFactory.CIDADE_ALEGRETE);
+		ScenarioFactory.FULANO.setCidade(ScenarioFactory.CIDADE_ALEGRETE);
+		this.clienteRepository.save(ScenarioFactory.FULANO);
 
 	}
 
-	@Então("eu realizo o cadastro de um novo cliente")
-	public void euRealizoOCadastroDeUmNovoCliente() {
-
-		assertThat(ScenarioFactory.NOVO_CLIENTE.getNome()).isEqualTo(cliente.getNome());
-
-	}
-
-	@Dado("um cliente com nome e sobrenome {string}, {string} e ao realizar a busca")
-	public void umClienteComNomeESobrenomeEAoRealizarABusca(String nome, String sobrenome) {
-		cliente = clienteController.buscarPorNomeCompleto(nome, sobrenome);
+	@Quando("realizar a busca")
+	public void buscarPorNomeCompleto_QuandoRealizarABusca() {
+		entityCliente = buscarPorNomeCompleto(ScenarioFactory.FULANO.getNome(), ScenarioFactory.FULANO.getSobrenome());
 	}
 
 	@Então("eu recebo as informações desse cliente")
-	public void euReceboAsInformaçõesDesseCliente() {
-		assertEquals(ScenarioFactory.CLIENTE_NOVO_FULANO.getNome(), cliente.getNome());
+	public void buscarPorNomeCompleto_EntaoEuReceboAsInformaçõesDesseCliente() {
+		assertEquals(entityCliente.getBody().getNome(), ScenarioFactory.FULANO.getNome());
+		assertEquals(entityCliente.getBody().getSobrenome(), ScenarioFactory.FULANO.getSobrenome());
+		assertEquals(entityCliente.getBody().getDataNascimento(), ScenarioFactory.FULANO.getDataNascimento());
+		assertEquals(entityCliente.getBody().getCidade().getNome(), ScenarioFactory.FULANO.getCidade().getNome());
+		assertEquals(entityCliente.getBody().getCidade().getEstado(), ScenarioFactory.FULANO.getCidade().getEstado());
+		assertEquals(entityCliente.getBody().getSexo(), ScenarioFactory.FULANO.getSexo());
+		this.httpCodeStatusExpected = HttpStatus.OK.value();
 	}
-
-	@Então("um nome,sobrenome,data de nascimento,sexo e cidade onde mora e esse cliente já foi cadastrado, entao retorna um exception com a a mensagem")
-	public void umNomeSobrenomeDataDeNascimentoSexoECidadeOndeMoraEEsseClienteJáFoiCadastradoEntaoRetornaUmExceptionComAAMensagem() {
-
-		assertThrows(BusinessException.class, () -> clienteController.cadastrar(ScenarioFactory.CLIENTE_JA_EXISTE));
-	}
-
-	@Então("dado um cliente com nome e sobrenome {string}, {string} e ao realizar a busca não existir, então deve retornar um exception")
-	public void dadoUmClienteComNomeESobrenomeEAoRealizarABuscaNãoExistirEntãoDeveRetornarUmException(String nome,
-			String sobrenome) {
-		assertThrows(ResourceNotFoundException.class, () -> clienteController.buscarPorNomeCompleto(nome, sobrenome));
-	}
-
-	@Dado("um nome {string}")
-	public void umNome(String nome) {
-		listaDeClientes = clienteController.buscarPorNome(nome);
-	}
-
-	@Então("deve retornar um lista com o nome informado possuindo todos os clientes com o mesmo nome")
-	public void deveRetornarUmListaComONomeInformadoPossuindoTodosOsClientesComOMesmoNome() {
-		assertThat(listaDeClientes.get(0).getNome()).isEqualTo(ScenarioFactory.CLIENTE_NOVO_FULANO.getNome());
-		assertThat(listaDeClientes.get(0).getSobrenome()).isEqualTo(ScenarioFactory.CLIENTE_NOVO_FULANO.getSobrenome());
-		assertThat(listaDeClientes.get(0).getSexo()).isEqualTo(ScenarioFactory.CLIENTE_NOVO_FULANO.getSexo());
-		assertThat(listaDeClientes.get(0).getDataNascimento())
-				.isEqualTo(ScenarioFactory.CLIENTE_NOVO_FULANO.getDataNascimento());
-		assertThat(listaDeClientes.get(0).getCidade().getNome())
-				.isEqualTo(ScenarioFactory.CLIENTE_NOVO_FULANO.getCidade().getNome());
-		assertThat(listaDeClientes.get(0).getCidade().getEstado())
-				.isEqualTo(ScenarioFactory.CLIENTE_NOVO_FULANO.getCidade().getEstado());
-	}
-
-	@Então("dado um nome que não possui cadastrado {string}, então retorna um exception")
-	public void dadoUmNomeQueNãoPossuiCadastradoEntãoRetornaUmException(String nome) {
-		assertThrows(ResourceNotFoundException.class, () -> clienteController.buscarPorNome(nome));
-	}
-
-	@Dado("um nome que será deletado no banco")
-	public void umNomeQueQueiraDeletar() {
-		status = clienteController.deletarCliente(ScenarioFactory.CLIENTE_NOVO_FULANO.getNome(),
-				ScenarioFactory.CLIENTE_NOVO_FULANO.getSobrenome());
-	}
-
-	@Então("ao deletar é exibido a mensagem {string}")
-	public void aoDeletarÉExibidoAMensagem(String mensagem) {
-		assertEquals(mensagem, status);
-
-	}
-
-	@Então("dado um nome a ser deletado que não esteja cadastrado {string}, {string} então deve retornar um exception")
-	public void dadoUmNomeASerDeletadoQueNãoEstejaCadastradoEntãoDeveRetornarUmException(String nome,
-			String sobrenome) {
-		assertThrows(ResourceNotFoundException.class, () -> clienteController.buscarPorNomeCompleto(nome, sobrenome));
-	}
-
-	@Dado("um cliente que queira atualizar o seu nome {string}, {string}")
-	public void umClienteQueQueiraAtualizarOSeuNome(String nome, String sobrenome) {
-		ScenarioFactory.ATUALIZAR_FULANO.setId(id);
-		ScenarioFactory.ATUALIZAR_FULANO.setNome(nome);
-		ScenarioFactory.ATUALIZAR_FULANO.setSobrenome(sobrenome);
-		cliente = clienteController.atualizarCliente(ScenarioFactory.ATUALIZAR_FULANO);
-	} 
-
-	@Então("deve retornar o nome do cliente atualizado")
-	public void deveRetornarONomeDoClienteAtualizado() {
-		assertThat(cliente.getNome()).isEqualTo(ScenarioFactory.ATUALIZAR_FULANO.getNome());
-		assertThat(cliente.getSobrenome()).isEqualTo(ScenarioFactory.ATUALIZAR_FULANO.getSobrenome());
-
-	} 
 	
-
 }

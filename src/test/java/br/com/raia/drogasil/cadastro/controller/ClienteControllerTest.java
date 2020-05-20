@@ -70,13 +70,13 @@ public class ClienteControllerTest {
 
 	@After
 	public void depois() {
-		this.clienteRepository.deleteAll();
 		this.cidadeRepository.deleteAll();
+		this.clienteRepository.deleteAll();
 
 	}
 
 	@Test
-	public void listarTodos() throws Exception {
+	public void listarClientes() throws Exception {
 		when(clienteService.listarClientes()).thenReturn(listarCliente);
 		List<ClienteDTO> listaCliente = clienteController.listarClientes();
 		assertThat(listaCliente.get(0).getNome()).isEqualTo(ScenarioFactory.FABIO.getNome());
@@ -100,7 +100,7 @@ public class ClienteControllerTest {
 	}
 
 	@Test
-	public void buscarPorIdSucesso() throws Exception {
+	public void buscarPorId_QuandoEstiverOk_EntaoReceboOk() throws Exception {
 		when(clienteService.buscarPorId(ScenarioFactory.FABIO.getId()))
 				.thenReturn(conversorCliente.toEntity(ScenarioFactory.FABIO, ClienteDTO.class));
 		ClienteDTO cliente = clienteController.buscarPorId(ScenarioFactory.FABIO.getId());
@@ -114,7 +114,7 @@ public class ClienteControllerTest {
 	}
 
 	@Test
-	public void cadastrarUmClienteComSucesso() throws Exception {
+	public void cadastrar_QuandoEstiverOk_EntaoReceboOk() throws Exception {
 		when(clienteService.cadastrar(ScenarioFactory.CLIENTE_NOVO_FULANO))
 				.thenReturn(conversorClienteForm.toEntity(ScenarioFactory.CLIENTE_NOVO_FULANO, ClienteDTO.class));
 		ClienteDTO cliente = clienteController.cadastrar(ScenarioFactory.CLIENTE_NOVO_FULANO);
@@ -128,7 +128,7 @@ public class ClienteControllerTest {
 	}
 
 	@Test
-	public void buscarPorNomeCompletoSucesso() throws Exception {
+	public void buscarNomeESobrenome_QuandoEstiverOk_EntaoReceboOk() throws Exception {
 		when(clienteService.buscarNomeESobrenome(ScenarioFactory.FABIO.getNome(), ScenarioFactory.FABIO.getSobrenome()))
 				.thenReturn(conversorCliente.toEntity(ScenarioFactory.FABIO, ClienteDTO.class));
 		ClienteDTO cliente = clienteController.buscarPorNomeCompleto(ScenarioFactory.FABIO.getNome(),
@@ -142,7 +142,7 @@ public class ClienteControllerTest {
 	}
 
 	@Test
-	public void buscarPorNomeSucesso() throws Exception {
+	public void buscarPorNome_QuandoEstiverOk_EntaoReceboOk() throws Exception {
 		when(clienteService.buscarPorNome(ScenarioFactory.FABIO.getNome())).thenReturn(listarCliente);
 		List<ClienteDTO> listaCliente = clienteController.buscarPorNome(ScenarioFactory.FABIO.getNome());
 		assertThat(listaCliente.get(0).getNome()).isEqualTo(ScenarioFactory.FABIO.getNome());
@@ -155,7 +155,7 @@ public class ClienteControllerTest {
 	}
 
 	@Test
-	public void deletarClienteComSucesso() throws Exception {
+	public void  deletarCliente_QuandoAchar_EntaoReceboOk() throws Exception {
 		when(clienteService.deletar(ScenarioFactory.FABIO.getNome(), ScenarioFactory.FABIO.getSobrenome()))
 				.thenReturn(ScenarioFactory.DELETAR);
 		String delete = clienteController.deletarCliente(ScenarioFactory.FABIO.getNome(),
@@ -164,7 +164,7 @@ public class ClienteControllerTest {
 	}
 
 	@Test
-	public void deletarClienteSemSucesso() throws Exception {
+	public void  deletarCliente_NaoEstiverNoBanco_EntaoReceboResourceNotFound() throws Exception {
 		when(clienteService.deletar("FULANO", "TAL")).thenReturn(ScenarioFactory.NAO_FOI_ENCONTRADO);
 		String delete = clienteController.deletarCliente("FULANO", "TAL");
 		assertEquals(ScenarioFactory.NAO_FOI_ENCONTRADO, delete);

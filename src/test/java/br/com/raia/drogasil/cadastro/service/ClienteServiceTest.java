@@ -20,7 +20,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import br.com.raia.drogasil.cadastro.config.validacao.BusinessException;
 import br.com.raia.drogasil.cadastro.config.validacao.ResourceNotFoundException;
 import br.com.raia.drogasil.cadastro.domain.dto.ClienteDTO;
 import br.com.raia.drogasil.cadastro.domain.model.Cliente;
@@ -60,12 +59,13 @@ public class ClienteServiceTest {
 
 	@After
 	public void depois() {
-		this.clienteRepository.deleteAll();
 		this.cidadeRepository.deleteAll();
+		this.clienteRepository.deleteAll();
+		
 	}
 
 	@Test
-	public void listaDeCliente() {
+	public void listarClientes() {
 		when(clienteRepository.findAll()).thenReturn(listaDeCliente);
 		List<ClienteDTO> listaCliente = clienteService.listarClientes();
 		assertThat(listaCliente.get(0).getNome()).isEqualTo(ScenarioFactory.FABIO.getNome());
@@ -74,7 +74,7 @@ public class ClienteServiceTest {
 	}
 
 	@Test
-	public void buscarPorNomeCompletoComSucesso() {
+	public void buscarNomeESobrenome_QuandoEstiverOk_EntaoReceboOk() {
 		Optional<Cliente> cliente = Optional.empty();
 		cliente = Optional.of(ScenarioFactory.FABIO);
 		when(clienteRepository.findByNomeAndSobrenome(ScenarioFactory.FABIO.getNome(),
@@ -86,21 +86,14 @@ public class ClienteServiceTest {
 	}
 
 	@Test
-	public void buscarPorNomeCompletoSemSucesso() {
+	public void buscarNomeESobrenome_NaoEstiverNoBanco_EntaoReceboResourceNotFound() {
 
 		assertThrows(ResourceNotFoundException.class, () -> clienteService.buscarNomeESobrenome("FULANO", "TAL")); 
 
 	}
 	
 	@Test
-	public void AtualizarSemSucesso() {
-
-		assertThrows(BusinessException.class, () -> clienteService.atualizarCliente(ScenarioFactory.ATUALIZAR_FULANO)); 
-
-	}
-
-	@Test
-	public void buscarPorNomes() {
+	public void buscarPorNome_QuandoEstiverOk_EntaoReceboOk() {
 		Optional<List<Cliente>> listClientes = Optional.empty();
 		listClientes = Optional.of(listaDeCliente);
 		when(clienteRepository.findByNome("FABIO")).thenReturn(listClientes);
@@ -109,13 +102,13 @@ public class ClienteServiceTest {
 	}
 
 	@Test
-	public void buscarPorNomesError() {
+	public void buscarPorNome_NaoEstiverNoBanco_EntaoReceboResourceNotFound() {
 		assertThrows(ResourceNotFoundException.class,
 				() -> clienteService.buscarPorNome(ScenarioFactory.ALEGRETE.getNome()));
 	}
 
 	@Test
-	public void buscarPorIdSucesso() {
+	public void buscarPorId_QuandoEstiverOk_EntaoReceboOk() {
 		Optional<Cliente> cliente = Optional.empty();
 		cliente = Optional.of(ScenarioFactory.FABIO);
 		when(clienteRepository.findById(ScenarioFactory.FABIO.getId())).thenReturn(cliente);
@@ -124,13 +117,13 @@ public class ClienteServiceTest {
 	}
 
 	@Test
-	public void buscarPorIdErro() {
+	public void buscarPorId_NaoEstiverNoBanco_EntaoReceboResourceNotFound() {
 
 		assertThrows(ResourceNotFoundException.class, () -> clienteService.buscarPorId(ScenarioFactory.FABIO.getId()));
 	}
 
 	@Test
-	public void deletarErro() {
+	public void deletarCliente_NaoEstiverNoBanco_EntaoReceboResourceNotFound() {
 
 		assertThrows(ResourceNotFoundException.class, () -> clienteService.deletar("JOSE", "CARLOS"));
 	}

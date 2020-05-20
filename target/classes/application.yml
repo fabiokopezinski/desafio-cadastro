@@ -4,12 +4,9 @@ spring:  datasource:
     url: ${JDBC_DATASOURCE_URL}
     username: postgres
     password: 124578  jpa:
-    hibernate:     ddl-auto: create    show-sql: true    
+    hibernate:     ddl-auto: create    show-sql: false    
 
 ### Swagger
 
 springdoc:  swagger-ui:    path: /swagger-ui.html
     
-server:  port: 8080
-
-  

@@ -34,8 +34,13 @@ public class ScenarioFactory {
 	public static final ClienteAtualizarForm ATUALIZAR_FULANO=atualizarFulano();
 	public static final Cliente FABIO = cliente();
 	public static final Cliente FABIOCARVALHO = clienteDois();
+	public static final Cliente FABIOKOPEZINSKI=clienteTres();
 	public static final Cliente FULANO = fulano(); 
+	public static final Cliente BELTRANO = beltrano(); 
 	public static final CidadeForm ALEGRETE=cidadeAlegreForm(); 
+	public static final Cidade CIDADE_ALEGRETE=alegrete();
+	public static final Cidade RIO_GRANDE=cidadeRioGrande();
+	public static final CidadeForm RIO_GRANDE_Form=cidadeRioGrandeForm();
 
 
 	public static final String NAO_ACHOU_NENHUM_ESTADO = "Não achou nenhum estado";
@@ -57,6 +62,42 @@ public class ScenarioFactory {
 		portoAlegre.setEstado("RIO GRANDE DO SUL");
 		return portoAlegre;
 	}
+ 
+	private static Cliente clienteTres() {
+		LocalDate dataNascimento = LocalDate.of(1993, 10, 21);
+		Cliente cliente = new Cliente();
+		cliente.setNome("FABIO"); 
+		cliente.setSobrenome("KOPEZINSKI");
+		cliente.setSexo(SexoEnum.MASCULINO);
+		cliente.setIdade(26);
+		cliente.setDataNascimento(dataNascimento);
+		cliente.setCidade(RIO_GRANDE);
+		return cliente;
+	}
+
+	private static Cliente beltrano() {
+		LocalDate dataNascimento = LocalDate.of(1993, 10, 21);
+		Cliente cliente = new Cliente();
+		cliente.setNome("BELTRANO"); 
+		cliente.setSobrenome("DE TAL");
+		cliente.setSexo(SexoEnum.MASCULINO);
+		cliente.setIdade(26);
+		cliente.setDataNascimento(dataNascimento);
+		cliente.setCidade(RIO_GRANDE);
+		return cliente;
+	}
+
+	private static CidadeForm cidadeRioGrandeForm() {
+		CidadeForm rioGrande = new CidadeForm("RIO GRANDE","RIO GRANDE DO SUL");
+		return rioGrande;
+	}
+
+	private static Cidade cidadeRioGrande() {
+		Cidade rioGrande = new Cidade();
+		rioGrande.setNome("RIO GRANDE");
+		rioGrande.setEstado("RIO GRANDE DO SUL");
+		return rioGrande;
+	}
 
 	private static ClienteAtualizarForm atualizarFulano() {
 		ClienteAtualizarForm atualizar=new ClienteAtualizarForm(null, null, null);
@@ -70,7 +111,7 @@ public class ScenarioFactory {
 
 	private static ClienteForm clienteNovo() {
 		LocalDate dataNascimento = LocalDate.of(1993, 10, 21);
-		return new ClienteForm("FULANO", "CARVALHO", SexoEnum.MASCULINO, dataNascimento, null);
+		return new ClienteForm("FULANO", "CARVALHO", SexoEnum.MASCULINO, dataNascimento, CIDADE_Form);
 	}
 
 	private static ClienteForm clienteBeltrano() {
@@ -130,7 +171,7 @@ public class ScenarioFactory {
 
 	private static ClienteForm clienteFulano() {
 		LocalDate dataNascimento = LocalDate.of(1993, 10, 21);
-		ClienteForm cliente = new ClienteForm("FULANO", "TAL", SexoEnum.MASCULINO, dataNascimento, CIDADE_Form); 
+		ClienteForm cliente = new ClienteForm("FULANO", "TAL", SexoEnum.MASCULINO, dataNascimento, RIO_GRANDE_Form); 
 		return cliente;
 	} 
  

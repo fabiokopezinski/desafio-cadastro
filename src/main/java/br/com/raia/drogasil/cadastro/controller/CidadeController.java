@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.raia.drogasil.cadastro.annotation.Constantes;
 import br.com.raia.drogasil.cadastro.annotation.DocumentacaoSwaggerCidade;
 import br.com.raia.drogasil.cadastro.domain.dto.CidadeDTO;
 import br.com.raia.drogasil.cadastro.domain.form.CidadeForm;
@@ -31,22 +32,7 @@ public class CidadeController {
 	@Autowired
 	private CidadeService cidadeService;
 
-	private final String LISTAR_CIDADE_ESTADOS = "Listar cidade e estados";
-	private final String LISTA_TODOS_OS_ESTADOS_E_CIDADES = "listas todos os estados e cidades";
-
-	private final String BUSCAR_POR_CIDADE = "Buscar por cidade";
-	private final String BUSCA_POR_UMA_CIDADE_ESPECIFICA = "Busca por uma cidade especifica";
-
-	private final String BUSCAR_POR_ESTADO = "Buscar por estado";
-	private final String BUSCA_POR_UMA_ESTADO_ESPECIFICA = "Busca por uma estado especifica";
-
-	private final String CADASTRO_DE_UMA_CIDADE = "Cadastro de cidade";
-	private final String CADASTRAR_UM_NOVA_CIDADE = "Cadastrar uma nova cidade";
-
-	private final String DELETAR_UMA_CIDADE = "Deletar cidade";
-	private final String APAGA_UMA_CIDADE_DO_BANCO = "Apagar uma cidade no banco de dados";
-
-	@Operation(summary = LISTAR_CIDADE_ESTADOS, description = LISTA_TODOS_OS_ESTADOS_E_CIDADES)
+	@Operation(summary = Constantes.LISTAR_CIDADE_ESTADOS, description = Constantes.LISTA_TODOS_OS_ESTADOS_E_CIDADES)
 	@DocumentacaoSwaggerCidade
 	@ResponseStatus(code = HttpStatus.OK)
 	@GetMapping
@@ -54,7 +40,7 @@ public class CidadeController {
 		return cidadeService.listaDeCidades();
 	}
 
-	@Operation(summary = BUSCAR_POR_CIDADE, description = BUSCA_POR_UMA_CIDADE_ESPECIFICA)
+	@Operation(summary = Constantes.BUSCAR_POR_CIDADE, description = Constantes.BUSCA_POR_UMA_CIDADE_ESPECIFICA)
 	@DocumentacaoSwaggerCidade
 	@ResponseStatus(code = HttpStatus.OK)
 	@GetMapping("/nome")
@@ -62,7 +48,7 @@ public class CidadeController {
 		return cidadeService.buscarPorCidade(nome);
 	}
 
-	@Operation(summary = BUSCAR_POR_ESTADO, description = BUSCA_POR_UMA_ESTADO_ESPECIFICA)
+	@Operation(summary = Constantes.BUSCAR_POR_ESTADO, description = Constantes.BUSCA_POR_UMA_ESTADO_ESPECIFICA)
 	@DocumentacaoSwaggerCidade
 	@ResponseStatus(code = HttpStatus.OK)
 	@GetMapping("/estado")
@@ -71,16 +57,16 @@ public class CidadeController {
 		return cidadeService.buscarPorEstado(estado);
 	}
 
-	@Operation(summary = CADASTRO_DE_UMA_CIDADE, description = CADASTRAR_UM_NOVA_CIDADE)
+	@Operation(summary = Constantes.CADASTRO_DE_UMA_CIDADE, description = Constantes.CADASTRAR_UM_NOVA_CIDADE)
 	@DocumentacaoSwaggerCidade
 	@ResponseStatus(code = HttpStatus.CREATED)
 	@PostMapping
 	@Transactional
 	public CidadeDTO cadastrarCidade(@RequestBody @Valid CidadeForm cidadeForm) {
-		return cidadeService.cadastrar(cidadeForm);  
+		return cidadeService.cadastrar(cidadeForm);
 	}
 
-	@Operation(summary = DELETAR_UMA_CIDADE, description = APAGA_UMA_CIDADE_DO_BANCO)
+	@Operation(summary = Constantes.DELETAR_UMA_CIDADE, description = Constantes.APAGA_UMA_CIDADE_DO_BANCO)
 	@DocumentacaoSwaggerCidade
 	@ResponseStatus(code = HttpStatus.OK)
 	@DeleteMapping

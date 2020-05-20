@@ -1,55 +1,51 @@
 # language :pt
 
-Funcionalidade: Cidade controller integração
+Funcionalidade: Cidade integração
 			
 			Como usuario 
 			Quero realizar as chamadas do controller da cidade
 			
 						
 Cenário: Deve listar cidades e estados
-
-			Então dado um chamado para o listarCidades, entao eu recebo uma lista
+			Dado que estou no listar cidades
+			Quando eu realizado uma chamada
+			Então recebo uma lista
+			Então recebo o status da lista 200
 			
-
-Cenário: Cadastrar uma cidade
-
-		Dado um nome de cidade e estado deve ser cadastrado
-		Então recebo um DTO
-		
-Cenário: Cadastrar uma cidade já existente
-
-		Então dado um nome de cidade e estado deve ser cadastrado "PORTO ALEGRE" , "RIO GRANDE DO SUL" retorna uma exception
-		
-Cenário: Buscar cidade com sucesso
-
-		Dado um nome de uma cidade "PORTO ALEGRE"
-		Então deve retornar a cidade informada
-		
-		
-Cenário: Buscar uma cidade que não foi encontrado
-
-		Então dado um nome de um cidade que não foi cadastrada "IJUI" retorna uma exception
 		
 
-Cenário: Buscar um estado com sucesso
+Cenário: Deve cadastrar uma cidade com sucesso
 
-		Dado um nome de um estado "RIO GRANDE DO SUL"
-		Então deve retornar uma lista de cidades desse estado
+		Dado uma cidade para cadastrar
+		Então cadastro uma cidade
+		Então recebo o status 201
 		
-Cenário: Buscar um estado sem sucesso
+Cenário: Deve cadastrar uma cidade sem sucesso
 
-		Então dado um nome de um estado que não foi cadastrado "SANTA CATARINA", deve retornar uma exception
+		Dado uma cidade para cadastrar que já existe
+		Então cadastro uma cidade já existente
 		
+Cenário: Deve realizar uma buscar por uma cidade
+
+		Dado uma cidade para realizar uma busca
+		Quando eu realizar a busca
+		Então recebo uma cidade
+		Então recebo o status 200
 		
-Cenário: Deletar uma cidade dos cadastros
-		
-		Dado um nome de uma cidade que deve ser apagado "PASSO FUNDO"
-		Então deve retornar uma mensagem "Deletada com sucesso"
+Cenário: Deve realizar uma buscar por uma cidade que não existe no banco
+
+		Dado uma cidade para realizar uma busca que não existe
+		Entao eu realizo um busca por uma cidade que não existe no banco
 		
 
-Cenário: Deletar uma cidade que não esteja cadastrado
+Cenário: Deve realizar uma buscar por um estado
 
-		Então dado uma cidade que não esteja nos cadastros, deve retornar a mensagem "SAO PAULO"
-		
-			
+			Dado um estado que devo realizar a busca
+			Quando eu realizar a busca do estado
+			Então recebo uma lista
+			Então recebo o status da lista 200
 
+Cenário: Deve realizar uma buscar por um estado que não existe no banco
+
+		Dado um estado para realizar uma busca que não existe
+		Então eu realizo um busca por um estado que não existe no banco

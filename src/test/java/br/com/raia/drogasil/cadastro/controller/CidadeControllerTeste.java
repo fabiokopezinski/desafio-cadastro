@@ -61,7 +61,7 @@ public class CidadeControllerTeste {
 	}
 
 	@Test
-	public void listarTodos() throws Exception {
+	public void listaDeCidades() throws Exception {
 		when(cidadeService.listaDeCidades()).thenReturn(listaCidades);
 		List<CidadeDTO> listarCidades = cidadeController.listaDeCidades();
 		assertThat(listarCidades.get(0).getNome()).isEqualTo(ScenarioFactory.CIDADE_PORTO_ALEGRE.getNome());
@@ -72,7 +72,7 @@ public class CidadeControllerTeste {
 	}
 
 	@Test
-	public void buscarPorCidadeSucesso() throws Exception {
+	public void buscarPorCidade_QuandoEstiverOk_EntaoReceboOk() throws Exception {
 		Optional<CidadeDTO> cidade = Optional.empty();
 		cidade = Optional.of(conversorCidade.toEntity(ScenarioFactory.CIDADE_PORTO_ALEGRE, CidadeDTO.class));
 		when(cidadeService.buscarPorCidade(ScenarioFactory.PORTO_ALEGRE)).thenReturn(cidade.get());
@@ -81,7 +81,7 @@ public class CidadeControllerTeste {
 	}
 
 	@Test
-	public void buscarEstadosSucesso() throws Exception {
+	public void buscarPorEstado_QuandoEstiverOk_EntaoReceboOk() throws Exception {
 
 		when(cidadeService.buscarPorEstado(ScenarioFactory.RIO_GRANDE_DO_SUL)).thenReturn(listaCidades);
 		List<CidadeDTO> novaListaCidades = cidadeController.buscarPorEstado(ScenarioFactory.RIO_GRANDE_DO_SUL);
@@ -90,7 +90,7 @@ public class CidadeControllerTeste {
 	}
 
 	@Test
-	public void cadastrar() throws Exception {
+	public void cadastrarCidade_QuandoEstiverOk_EntaoReceboOk() throws Exception {
 		when(cidadeService.cadastrar(ScenarioFactory.CIDADE_Form))
 				.thenReturn(conversorCidadeForm.toEntity(ScenarioFactory.CIDADE_Form, CidadeDTO.class));
 		CidadeDTO retorno = cidadeController.cadastrarCidade(ScenarioFactory.CIDADE_Form);
@@ -99,14 +99,14 @@ public class CidadeControllerTeste {
 	}
 
 	@Test
-	public void deletarCidadeComSucesso() throws Exception {
+	public void deletarCidade_QuandoAchar_EntaoReceboOK() throws Exception {
 		when(cidadeService.deletar(ScenarioFactory.PORTO_ALEGRE)).thenReturn(ScenarioFactory.DELETAR);
 		String deletado = cidadeController.deletarCidade(ScenarioFactory.PORTO_ALEGRE);
 		assertEquals(deletado, ScenarioFactory.DELETAR);
 	}
 
 	@Test
-	public void deletarCidadeSemSucesso() throws Exception {
+	public void deletarCidade_QuandoNaoAchar_EntaoReceboResourcesNotFound() throws Exception {
 		when(cidadeService.deletar(ScenarioFactory.SAO_PAULO)).thenReturn(ScenarioFactory.NAO_FOI_ENCONTRADO);
 		String deletado = cidadeController.deletarCidade(ScenarioFactory.SAO_PAULO);
 		assertEquals(deletado, ScenarioFactory.NAO_FOI_ENCONTRADO);
