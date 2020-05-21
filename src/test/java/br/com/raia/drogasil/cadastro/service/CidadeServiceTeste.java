@@ -1,6 +1,7 @@
 package br.com.raia.drogasil.cadastro.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
@@ -15,7 +16,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -23,12 +23,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 import br.com.raia.drogasil.cadastro.config.validacao.ResourceNotFoundException;
 import br.com.raia.drogasil.cadastro.domain.dto.CidadeDTO;
 import br.com.raia.drogasil.cadastro.domain.model.Cidade;
-import br.com.raia.drogasil.cadastro.domain.repository.CidadeRepository;
+import br.com.raia.drogasil.cadastro.repository.CidadeRepository;
 import br.com.raia.drogasil.cadastro.scenario.ScenarioFactory;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@AutoConfigureMockMvc
 public class CidadeServiceTeste {
 
 	@MockBean
@@ -41,7 +40,8 @@ public class CidadeServiceTeste {
 	private CidadeService cidadeService;
 
 	private List<Cidade> listaCidades = new ArrayList<Cidade>();
-
+	
+	
 	@Before
 	public void antes() {
 
@@ -101,7 +101,16 @@ public class CidadeServiceTeste {
 
 	@Test
 	public void deletar_QuandoNaoAchar_EntaoReceboResourceNotFoundException() throws Exception {
-		assertThrows(ResourceNotFoundException.class, ()->cidadeService.buscarPorCidade(ScenarioFactory.SAO_PAULO)); 
+		assertThrows(ResourceNotFoundException.class, ()->cidadeService.deletar(ScenarioFactory.SAO_PAULO)); 
 	}
-
+	
+	@Test
+	public void deletar_QuandoAchar_EntaoDeleto() {
+		Optional<Cidade> cidade = Optional.empty();
+		cidade = Optional.of(ScenarioFactory.CIDADE_PORTO_ALEGRE);
+		when(cidadeRepository.findByNome(ScenarioFactory.PORTO_ALEGRE)).thenReturn(cidade);
+		String deletado=cidadeService.deletar(ScenarioFactory.PORTO_ALEGRE);
+		assertEquals(ScenarioFactory.DELETAR, deletado);
+	}
+	
 }

@@ -1,6 +1,7 @@
 package br.com.raia.drogasil.cadastro.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
@@ -15,21 +16,23 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import br.com.raia.drogasil.cadastro.config.validacao.BusinessException;
 import br.com.raia.drogasil.cadastro.config.validacao.ResourceNotFoundException;
+import br.com.raia.drogasil.cadastro.converter.Converter;
 import br.com.raia.drogasil.cadastro.domain.dto.ClienteDTO;
+import br.com.raia.drogasil.cadastro.domain.form.ClienteAtualizarForm;
+import br.com.raia.drogasil.cadastro.domain.form.ClienteForm;
 import br.com.raia.drogasil.cadastro.domain.model.Cliente;
-import br.com.raia.drogasil.cadastro.domain.repository.CidadeRepository;
-import br.com.raia.drogasil.cadastro.domain.repository.ClienteRepository;
+import br.com.raia.drogasil.cadastro.repository.CidadeRepository;
+import br.com.raia.drogasil.cadastro.repository.ClienteRepository;
 import br.com.raia.drogasil.cadastro.scenario.ScenarioFactory;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@AutoConfigureMockMvc
 public class ClienteServiceTest {
 
 	@MockBean
@@ -43,18 +46,24 @@ public class ClienteServiceTest {
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
+	
+	@MockBean
+	private Converter<ClienteForm, Cliente> conversorForm;
 
 	private List<Cliente> listaDeCliente = new ArrayList<Cliente>();
+	
 
 	@Before
 	public void antes() {
 
 		this.cidadeRepository.save(ScenarioFactory.CIDADE_PORTO_ALEGRE);
 		this.cidadeRepository.save(ScenarioFactory.CIDADE_PASSO_FUNDO);
+		this.cidadeRepository.save(ScenarioFactory.CIDADE_VIAMAO);
 		this.clienteRepository.save(ScenarioFactory.FABIO);
 		this.clienteRepository.save(ScenarioFactory.FABIOCARVALHO);
 		listaDeCliente.add(ScenarioFactory.FABIO);
 		listaDeCliente.add(ScenarioFactory.FABIOCARVALHO);
+		
 	}
 
 	@After
@@ -92,27 +101,71 @@ public class ClienteServiceTest {
 
 	}
 	
+ 	@Test
+	public void cadastrar_QuandoClienteJaFoiCadastrado_EntaoReceboBusinessException() {
+		Optional<Cliente> cliente = Optional.empty();
+		cliente = Optional.of(ScenarioFactory.FABIOCARVALHO);
+		ScenarioFactory.CLIENTE_FORM_EXISTENTE.setNome("FABIO");
+		ScenarioFactory.CLIENTE_FORM_EXISTENTE.setSobrenome("CARVALHO");
+		when(clienteRepository.findByNomeAndSobrenome("FABIO", "CARVALHO")).thenReturn(cliente);
+		assertThrows(BusinessException.class,
+				() -> clienteService.cadastrar(ScenarioFactory.CLIENTE_FORM_EXISTENTE)); 
+		
+	}
+	
 	@Test
 	public void buscarPorNome_QuandoEstiverOk_EntaoReceboOk() {
 		Optional<List<Cliente>> listClientes = Optional.empty();
 		listClientes = Optional.of(listaDeCliente);
 		when(clienteRepository.findByNome("FABIO")).thenReturn(listClientes);
-		List<ClienteDTO> novaListaCliente = clienteService.buscarPorNome(ScenarioFactory.FABIO.getNome());
-		assertThat(novaListaCliente.get(0).getNome()).isEqualTo(ScenarioFactory.FABIO.getNome());
+		List<ClienteDTO> novaListaCliente = clienteService.buscarPorNome(ScenarioFactory.FABIOCARVALHO.getNome());
+		assertThat(novaListaCliente.get(1).getNome()).isEqualTo(ScenarioFactory.FABIOCARVALHO.getNome());
 	}
 
 	@Test
 	public void buscarPorNome_NaoEstiverNoBanco_EntaoReceboResourceNotFound() {
 		assertThrows(ResourceNotFoundException.class,
-				() -> clienteService.buscarPorNome(ScenarioFactory.ALEGRETE.getNome()));
+				() -> clienteService.buscarPorNome(ScenarioFactory.BELTRANO.getNome()));
 	}
 
 	@Test
-	public void buscarPorId_QuandoEstiverOk_EntaoReceboOk() {
+	public void atualizarCliente_QuandoNaoExistirNinguemComMesmoNome_EntaoReceboOK() {
 		Optional<Cliente> cliente = Optional.empty();
 		cliente = Optional.of(ScenarioFactory.FABIO);
 		when(clienteRepository.findById(ScenarioFactory.FABIO.getId())).thenReturn(cliente);
-		ClienteDTO novoCliente = clienteService.buscarPorId(ScenarioFactory.FABIO.getId());
+		ScenarioFactory.ATUALIZAR_FULANO.setId(ScenarioFactory.FABIO.getId());
+		ScenarioFactory.ATUALIZAR_FULANO.setNome("FULANO");
+		ScenarioFactory.ATUALIZAR_FULANO.setSobrenome(ScenarioFactory.FABIO.getSobrenome()); 
+		ClienteDTO clienteDTO=clienteService.atualizarCliente(ScenarioFactory.ATUALIZAR_FULANO);
+		assertEquals(ScenarioFactory.ATUALIZAR_FULANO.getNome(), clienteDTO.getNome());
+	}
+	
+	@Test
+	public void atualizarCliente_QuandoNaoExistir_EntaoReceboResourceNotFound() {
+		
+		assertThrows(ResourceNotFoundException.class, () -> clienteService.atualizarCliente(new ClienteAtualizarForm(1,"FULANO","TAL"))); 
+	}
+	 
+	@Test
+	public void atualizarCliente_QuandoEExistirAlguemComMesmoNome_EntaoReceboBusinessException() {
+		Optional<Cliente> cliente = Optional.empty();
+		cliente = Optional.of(ScenarioFactory.FABIO); 
+		ScenarioFactory.ATUALIZAR_FULANO.setId(ScenarioFactory.FABIO.getId());
+		ScenarioFactory.ATUALIZAR_FULANO.setNome("FABIO");
+		ScenarioFactory.ATUALIZAR_FULANO.setSobrenome(ScenarioFactory.FABIOCARVALHO.getSobrenome()); 
+		when(clienteRepository.findById(ScenarioFactory.FABIO.getId())).thenReturn(cliente);
+		when(clienteRepository.findByNomeAndSobrenome(ScenarioFactory.ATUALIZAR_FULANO.getNome(), ScenarioFactory.ATUALIZAR_FULANO.getSobrenome())).thenReturn(cliente);
+		assertThrows(BusinessException.class, () -> clienteService.atualizarCliente(ScenarioFactory.ATUALIZAR_FULANO)); 
+		
+		
+	}
+	
+	@Test
+	public void buscarPorId_QuandoEstiverNoBanco_EntaoReceboOk() {
+		Optional<Cliente> cliente = Optional.empty();
+		cliente = Optional.of(ScenarioFactory.FABIOCARVALHO);
+		when(clienteRepository.findById(ScenarioFactory.FABIOCARVALHO.getId())).thenReturn(cliente);
+		ClienteDTO novoCliente = clienteService.buscarPorId(ScenarioFactory.FABIOCARVALHO.getId());
 		assertThat(novoCliente.getNome()).isEqualTo("FABIO");
 	}
 
@@ -127,5 +180,16 @@ public class ClienteServiceTest {
 
 		assertThrows(ResourceNotFoundException.class, () -> clienteService.deletar("JOSE", "CARLOS"));
 	}
+	
+	@Test
+	public void deletarCliente_QuandoEstiverNoBanco_EntaoReceboDeletadoComSucesso() {
+		Optional<Cliente> cliente = Optional.empty();
+		cliente = Optional.of(ScenarioFactory.FABIO);
+		when(clienteRepository.findByNomeAndSobrenome(ScenarioFactory.FABIO.getNome(),
+				ScenarioFactory.FABIO.getSobrenome())).thenReturn(cliente);
+		String deletado=clienteService.deletar(ScenarioFactory.FABIO.getNome(), ScenarioFactory.FABIO.getSobrenome());
+		assertEquals(ScenarioFactory.DELETAR, deletado);
+	}
 
+	
 }

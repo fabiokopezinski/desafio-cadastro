@@ -22,7 +22,7 @@ import br.com.raia.drogasil.cadastro.converter.Converter;
 import br.com.raia.drogasil.cadastro.domain.dto.CidadeDTO;
 import br.com.raia.drogasil.cadastro.domain.form.CidadeForm;
 import br.com.raia.drogasil.cadastro.domain.model.Cidade;
-import br.com.raia.drogasil.cadastro.domain.repository.CidadeRepository;
+import br.com.raia.drogasil.cadastro.repository.CidadeRepository;
 import br.com.raia.drogasil.cadastro.scenario.ScenarioFactory;
 import br.com.raia.drogasil.cadastro.service.CidadeService;
 

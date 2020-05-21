@@ -1,4 +1,4 @@
-package br.com.raia.drogasil.cadastro.domain.repository;
+package br.com.raia.drogasil.cadastro.repository;
 
 import java.util.List;
 import java.util.Optional;

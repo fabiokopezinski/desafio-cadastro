@@ -51,17 +51,6 @@ public class FeatureBase {
 		return template.postForEntity("http://localhost:" + randomServerPort + "/cidades", request, CidadeDTO.class);
 	}
 	
-	protected ResponseEntity<List<ClienteDTO>> buscarPorNomes(String nomes) {
-
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("Content-type", "application/json");
-		ResponseEntity<List<ClienteDTO>> exchange = template.exchange(
-				"http://localhost:" + randomServerPort + "/clientes/nome?nome=" + nomes, HttpMethod.GET, null,
-				new ParameterizedTypeReference<List<ClienteDTO>>() {
-				});
-		return exchange;
-	}
-	
 	protected ResponseEntity<ClienteDTO> buscarPorNomeCompleto(String nome,String sobreNome) {
 
 		HttpHeaders headers = new HttpHeaders();

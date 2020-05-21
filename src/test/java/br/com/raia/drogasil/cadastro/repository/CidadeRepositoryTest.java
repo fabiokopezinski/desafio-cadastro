@@ -18,7 +18,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import br.com.raia.drogasil.cadastro.domain.model.Cidade;
-import br.com.raia.drogasil.cadastro.domain.repository.CidadeRepository;
 import br.com.raia.drogasil.cadastro.scenario.ScenarioFactory;
 
 @RunWith(SpringRunner.class)

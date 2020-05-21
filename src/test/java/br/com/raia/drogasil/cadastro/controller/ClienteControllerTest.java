@@ -21,10 +21,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import br.com.raia.drogasil.cadastro.converter.Converter;
 import br.com.raia.drogasil.cadastro.domain.dto.ClienteDTO;
+import br.com.raia.drogasil.cadastro.domain.form.ClienteAtualizarForm;
 import br.com.raia.drogasil.cadastro.domain.form.ClienteForm;
 import br.com.raia.drogasil.cadastro.domain.model.Cliente;
-import br.com.raia.drogasil.cadastro.domain.repository.CidadeRepository;
-import br.com.raia.drogasil.cadastro.domain.repository.ClienteRepository;
+import br.com.raia.drogasil.cadastro.repository.CidadeRepository;
+import br.com.raia.drogasil.cadastro.repository.ClienteRepository;
 import br.com.raia.drogasil.cadastro.scenario.ScenarioFactory;
 import br.com.raia.drogasil.cadastro.service.ClienteService;
 
@@ -53,6 +54,9 @@ public class ClienteControllerTest {
 
 	@Autowired
 	private Converter<ClienteForm, ClienteDTO> conversorClienteForm;
+	
+	@Autowired
+	private Converter<ClienteAtualizarForm, ClienteDTO> conversorClienteAtualizarForm;
 
 	private List<ClienteDTO> listarCliente = new ArrayList<ClienteDTO>();
 
@@ -97,7 +101,7 @@ public class ClienteControllerTest {
 		assertThat(listaCliente.get(1).getCidade().getEstado())
 				.isEqualTo(ScenarioFactory.FABIO.getCidade().getEstado());
 
-	}
+	} 
 
 	@Test
 	public void buscarPorId_QuandoEstiverOk_EntaoReceboOk() throws Exception {
@@ -125,6 +129,16 @@ public class ClienteControllerTest {
 		assertThat(cliente.getCidade().getNome()).isEqualTo(ScenarioFactory.CLIENTE_NOVO_FULANO.getCidade().getNome());
 		assertThat(cliente.getCidade().getEstado())
 				.isEqualTo(ScenarioFactory.CLIENTE_NOVO_FULANO.getCidade().getEstado());
+	}
+	
+	@Test
+	public void atualizarCliente_QuandoTiverUmCliente_EntaoRecebo() {
+		ScenarioFactory.ATUALIZAR_FULANO.setId(ScenarioFactory.FABIO.getId());
+		ScenarioFactory.ATUALIZAR_FULANO.setNome("FULANO");
+		ScenarioFactory.ATUALIZAR_FULANO.setSobrenome(ScenarioFactory.FABIO.getSobrenome());
+		when(clienteService.atualizarCliente(ScenarioFactory.ATUALIZAR_FULANO)).thenReturn(conversorClienteAtualizarForm.toEntity(ScenarioFactory.ATUALIZAR_FULANO, ClienteDTO.class));
+		ClienteDTO clienteDTO = clienteController.atualizarCliente(ScenarioFactory.ATUALIZAR_FULANO);
+		assertEquals(ScenarioFactory.ATUALIZAR_FULANO.getNome(), clienteDTO.getNome());		
 	}
 
 	@Test

@@ -13,9 +13,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 
 import br.com.raia.drogasil.cadastro.domain.dto.CidadeDTO;
-import br.com.raia.drogasil.cadastro.domain.repository.CidadeRepository;
-import br.com.raia.drogasil.cadastro.domain.repository.ClienteRepository;
 import br.com.raia.drogasil.cadastro.featurebase.FeatureBase;
+import br.com.raia.drogasil.cadastro.repository.CidadeRepository;
+import br.com.raia.drogasil.cadastro.repository.ClienteRepository;
 import br.com.raia.drogasil.cadastro.scenario.ScenarioFactory;
 import cucumber.api.java.pt.Dado;
 import cucumber.api.java.pt.Então;

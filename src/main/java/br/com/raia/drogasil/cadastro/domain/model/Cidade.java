@@ -12,7 +12,6 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,7 +20,6 @@ import lombok.ToString;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @ToString(exclude = { "cliente" })
 @Table(name = "CIDADE")
@@ -31,7 +29,6 @@ public class Cidade {
 	@Id
 	@Column(name = "id", nullable = false, updatable = false)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cidade_seq_id")
-	
 	private Integer id;
 	@NotBlank
 	@Column(unique = true)

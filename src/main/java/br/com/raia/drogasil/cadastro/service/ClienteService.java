@@ -15,8 +15,8 @@ import br.com.raia.drogasil.cadastro.domain.form.ClienteAtualizarForm;
 import br.com.raia.drogasil.cadastro.domain.form.ClienteForm;
 import br.com.raia.drogasil.cadastro.domain.model.Cidade;
 import br.com.raia.drogasil.cadastro.domain.model.Cliente;
-import br.com.raia.drogasil.cadastro.domain.repository.CidadeRepository;
-import br.com.raia.drogasil.cadastro.domain.repository.ClienteRepository;
+import br.com.raia.drogasil.cadastro.repository.CidadeRepository;
+import br.com.raia.drogasil.cadastro.repository.ClienteRepository;
 
 @Service
 public class ClienteService {
@@ -75,7 +75,7 @@ public class ClienteService {
 	private Cidade buscarCidade(ClienteForm clienteForm) {
 
 		return cidadeRepository.findByNome(clienteForm.getCidade().getNome().toUpperCase())
-				.orElseThrow(() -> new ResourceNotFoundException(Constantes.NAO_FOI_ENCONTRADO));
+				.orElseThrow(() -> new ResourceNotFoundException(Constantes.NAO_FOI_ENCONTRADO)); 
 	}
 
 
@@ -96,7 +96,7 @@ public class ClienteService {
 			throw new ResourceNotFoundException(Constantes.CLIENTE_NAO_FOI_ENCONTRADO);
 		}
 		else {
-			throw new BusinessException(Constantes.JA_EXISTE); 
+			throw new BusinessException(Constantes.JA_EXISTE);  
 		}
 		
 	}
