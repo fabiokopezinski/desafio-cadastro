@@ -47,10 +47,7 @@ public class CidadeService {
 	}
 
 	public CidadeDTO cadastrar(CidadeForm cidade) {
-		String nome = cidade.getNome();
-		String estado = cidade.getEstado();
-		cidade.setNome(nome.toUpperCase());
-		cidade.setEstado(estado.toUpperCase());
+		
 		Optional<Cidade> cidadeNome = cidadeRepository.findByNome(cidade.getNome());
 		if (cidadeNome.isEmpty()) {
 

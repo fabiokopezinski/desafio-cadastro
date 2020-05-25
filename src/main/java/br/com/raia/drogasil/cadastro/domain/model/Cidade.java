@@ -8,6 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.PrePersist;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
@@ -15,13 +16,11 @@ import javax.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @Entity
-@ToString(exclude = { "cliente" })
 @Table(name = "CIDADE")
 @SequenceGenerator(name = "CIDADE", sequenceName = "cidade_seq_id", allocationSize = 1)
 public class Cidade {
@@ -38,4 +37,11 @@ public class Cidade {
 
 	@OneToMany(mappedBy = "cidade")
 	private List<Cliente> cliente;
+	
+	@PrePersist 
+	public void setarCidade() {
+		this.setNome(nome.toUpperCase());
+		this.setEstado(estado.toUpperCase());
+	}
+	
 }

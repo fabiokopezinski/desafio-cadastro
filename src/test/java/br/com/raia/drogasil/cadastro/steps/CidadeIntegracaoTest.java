@@ -22,7 +22,7 @@ import cucumber.api.java.pt.Então;
 import cucumber.api.java.pt.Quando;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-public class CidadeControllerSteps extends FeatureBase {
+public class CidadeIntegracaoTest extends FeatureBase {
 
 	@Autowired
 	private CidadeRepository cidadeRepository;
@@ -39,8 +39,6 @@ public class CidadeControllerSteps extends FeatureBase {
 	@Dado("que estou no listar cidades")
 	public void listaDeCidades_PopularBanco() {
 
-		this.clienteRepository.deleteAll();
-		this.cidadeRepository.deleteAll();
 		this.cidadeRepository.save(ScenarioFactory.CIDADE_PORTO_ALEGRE);
 		this.cidadeRepository.save(ScenarioFactory.CIDADE_PASSO_FUNDO);
 
@@ -53,10 +51,8 @@ public class CidadeControllerSteps extends FeatureBase {
 
 	@Então("recebo uma lista")
 	public void listaDeCidades_ReceboUmaLista() {
-		assertEquals(listaEntity.getBody().get(0).getNome(), ScenarioFactory.CIDADE_PORTO_ALEGRE.getNome());
+		assertEquals(ScenarioFactory.CIDADE_PORTO_ALEGRE.getNome(), listaEntity.getBody().get(0).getNome());
 		assertEquals(listaEntity.getBody().get(0).getEstado(), ScenarioFactory.CIDADE_PORTO_ALEGRE.getEstado());
-		assertEquals(listaEntity.getBody().get(1).getNome(), ScenarioFactory.CIDADE_PASSO_FUNDO.getNome());
-		assertEquals(listaEntity.getBody().get(1).getEstado(), ScenarioFactory.CIDADE_PASSO_FUNDO.getEstado());
 		this.httpCodeStatusExpected = HttpStatus.OK.value();
 
 	}
@@ -73,19 +69,22 @@ public class CidadeControllerSteps extends FeatureBase {
 
 	}
 
-	@Dado("uma cidade para cadastrar que já existe")
-	public void cadastrarCidade_DadoUmaCidadeJaExistenteNoBanco() {
-		this.clienteRepository.deleteAll();
-		this.cidadeRepository.deleteAll();
-		this.cidadeRepository.save(ScenarioFactory.CIDADE_PORTO_ALEGRE);
-
-	}
+	
 
 	@Então("cadastro uma cidade")
 	public void cadastrarCidade_EntaoReceboUmaCidade() {
 		assertEquals(entity.getBody().getNome(), ScenarioFactory.CIDADE_GRAVATAI.getNome());
 		assertEquals(entity.getBody().getEstado(), ScenarioFactory.CIDADE_GRAVATAI.getEstado());
 		this.httpCodeStatusExpected = HttpStatus.CREATED.value();
+	}
+	
+	
+	@Dado("uma cidade para cadastrar que já existe")
+	public void cadastrarCidade_DadoUmaCidadeJaExistenteNoBanco() {
+		this.clienteRepository.deleteAll();
+		this.cidadeRepository.deleteAll();
+		this.cidadeRepository.save(ScenarioFactory.CIDADE_PORTO_ALEGRE);
+
 	}
 
 	@Então("cadastro uma cidade já existente")
@@ -98,6 +97,7 @@ public class CidadeControllerSteps extends FeatureBase {
 	public void cadastrarCidade_EntaoReceboOstatusOk(Integer int1) {
 		assertEquals(entity.getStatusCodeValue(), httpCodeStatusExpected);
 	}
+	
 
 	@Dado("uma cidade para realizar uma busca")
 	public void buscarCidade_DadoUmaCidadeParaRealizarUmaBusca() {

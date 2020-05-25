@@ -30,7 +30,7 @@ public class FeatureBase {
 		headers.add("Content-type", "application/json");
 		ResponseEntity<List<CidadeDTO>> exchange = template.exchange(
 				"http://localhost:" + randomServerPort + "/cidades", HttpMethod.GET, null,
-				new ParameterizedTypeReference<List<CidadeDTO>>() {
+				new ParameterizedTypeReference<List<CidadeDTO>>() { 
 				});
 		return exchange;
 	}

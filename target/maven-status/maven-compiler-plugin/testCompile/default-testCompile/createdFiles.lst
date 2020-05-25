@@ -1,5 +1,15 @@
-br\com\raia\drogasil\cadastro\CadastroApplicationTests.class
+br\com\raia\drogasil\cadastro\repository\CidadeRepositoryTest.class
+br\com\raia\drogasil\cadastro\featurebase\FeatureBase$2.class
+br\com\raia\drogasil\cadastro\featurebase\FeatureBase$3.class
 br\com\raia\drogasil\cadastro\controller\CidadeControllerTeste.class
+br\com\raia\drogasil\cadastro\controller\ClienteControllerTest.class
+br\com\raia\drogasil\cadastro\featurebase\FeatureBase$1.class
+br\com\raia\drogasil\cadastro\steps\ClienteControllerSteps.class
 br\com\raia\drogasil\cadastro\steps\CidadeControllerSteps.class
+br\com\raia\drogasil\cadastro\CadastroApplicationTests.class
+br\com\raia\drogasil\cadastro\service\CidadeServiceTeste.class
+br\com\raia\drogasil\cadastro\repository\ClienteRepositoryTest.class
+br\com\raia\drogasil\cadastro\featurebase\FeatureBase.class
 br\com\raia\drogasil\cadastro\scenario\ScenarioFactory.class
 br\com\raia\drogasil\cadastro\runner\Runner.class
+br\com\raia\drogasil\cadastro\service\ClienteServiceTest.class

@@ -23,14 +23,12 @@ import br.com.raia.drogasil.cadastro.domain.enumeration.SexoEnum;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @Entity
 @Table(name = "CLIENTE")
-@ToString
 @SequenceGenerator(name = "CLIENTE", sequenceName = "cliente_seq_id", initialValue = 1, allocationSize = 1)
 public class Cliente {
 
@@ -55,6 +53,9 @@ public class Cliente {
 		LocalDate hoje = LocalDate.now();
 		Period idadePeriod=dataNascimento.until(hoje);
 		idade=idadePeriod.getYears();
+		this.setNome(nome.toUpperCase());
+		this.setSobrenome(sobrenome.toUpperCase());
 	}
+	
 
 }

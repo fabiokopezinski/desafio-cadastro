@@ -42,48 +42,46 @@ public class ClienteService {
 
 	public ClienteDTO buscarNomeESobrenome(String nome, String sobreNome) {
 
-		return conversorCliente
-				.toOutPut(
-						clienteRepository.findByNomeAndSobrenome(nome.toUpperCase(), sobreNome.toUpperCase())
-								.orElseThrow(() -> new ResourceNotFoundException(Constantes.CLIENTE_NAO_FOI_ENCONTRADO)),
-						ClienteDTO.class);
+		return conversorCliente.toOutPut(
+				clienteRepository.findByNomeAndSobrenome(nome.toUpperCase(), sobreNome.toUpperCase()).orElseThrow(
+						() -> new ResourceNotFoundException(Constantes.CLIENTE_NAO_FOI_ENCONTRADO)),
+				ClienteDTO.class);
 	}
 
 	public List<ClienteDTO> buscarPorNome(String nome) {
-		return conversorCliente.toArray(clienteRepository.findByNome(nome.toUpperCase())
-				.orElseThrow(() -> new ResourceNotFoundException(Constantes.CLIENTES_NAO_FORAM_ENCONTRADOS)), ClienteDTO.class);
+		return conversorCliente.toArray(
+				clienteRepository.findByNome(nome.toUpperCase())
+						.orElseThrow(() -> new ResourceNotFoundException(Constantes.CLIENTES_NAO_FORAM_ENCONTRADOS)),
+				ClienteDTO.class);
 
 	}
 
 	public ClienteDTO cadastrar(ClienteForm clienteForm) {
 		Optional<Cliente> acharNome = clienteRepository.findByNomeAndSobrenome(clienteForm.getNome().toUpperCase(),
 				clienteForm.getSobrenome().toUpperCase());
+		
 		if (acharNome.isEmpty()) {
 
 			Cliente cliente = conversorForm.toEntity(clienteForm, Cliente.class);
-			cliente.setNome(clienteForm.getNome().toUpperCase());
-			cliente.setSobrenome(clienteForm.getSobrenome().toUpperCase());
 			cliente.setCidade(buscarCidade(clienteForm));
 			return conversorCliente.toOutPut(clienteRepository.save(cliente), ClienteDTO.class);
 
-		} else {
-
-			throw new BusinessException(Constantes.JA_FOI_REGISTRADO);
 		}
+
+		throw new BusinessException(Constantes.JA_FOI_REGISTRADO);
+
 	}
 
 	private Cidade buscarCidade(ClienteForm clienteForm) {
-
 		return cidadeRepository.findByNome(clienteForm.getCidade().getNome().toUpperCase())
-				.orElseThrow(() -> new ResourceNotFoundException(Constantes.NAO_FOI_ENCONTRADO)); 
+				.orElseThrow(() -> new ResourceNotFoundException(Constantes.NAO_FOI_ENCONTRADO));
 	}
 
-
 	public ClienteDTO atualizarCliente(ClienteAtualizarForm clienteAtualizarForm) {
-		Cliente cliente = conversorAtualizar.toEntity(clienteAtualizarForm, Cliente.class); 
+		Cliente cliente = conversorAtualizar.toEntity(clienteAtualizarForm, Cliente.class);
 		boolean present = clienteRepository.findById(cliente.getId()).isPresent();
-		Optional<Cliente> buscarNome = clienteRepository.findByNomeAndSobrenome(
-				clienteAtualizarForm.getNome().toUpperCase(), clienteAtualizarForm.getSobrenome().toUpperCase());
+		Optional<Cliente> buscarNome = clienteRepository.findByNomeAndSobrenome(clienteAtualizarForm.getNome(),
+				clienteAtualizarForm.getSobrenome());
 		if (present && !buscarNome.isPresent()) {
 			cliente.setNome(clienteAtualizarForm.getNome().toUpperCase());
 			cliente.setSobrenome(clienteAtualizarForm.getSobrenome().toUpperCase());
@@ -91,25 +89,23 @@ public class ClienteService {
 			novoCliente.get().setNome(cliente.getNome());
 			novoCliente.get().setSobrenome(cliente.getSobrenome());
 			return conversorCliente.toOutPut(novoCliente.get(), ClienteDTO.class);
-		}
-		else if (!present) {
+		} else if (!present) {
 			throw new ResourceNotFoundException(Constantes.CLIENTE_NAO_FOI_ENCONTRADO);
+		} else {
+			throw new BusinessException(Constantes.JA_EXISTE);
 		}
-		else {
-			throw new BusinessException(Constantes.JA_EXISTE);  
-		}
-		
+
 	}
 
 	public ClienteDTO buscarPorId(Integer id) {
 		return conversorCliente.toOutPut(
 				clienteRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(Constantes.NAO_ACHOU)),
-				ClienteDTO.class); 
+				ClienteDTO.class);
 	}
 
 	public String deletar(String nome, String sobrenome) {
 
-		Optional<Cliente> deletarCliente = clienteRepository.findByNomeAndSobrenome(nome.toUpperCase(), 
+		Optional<Cliente> deletarCliente = clienteRepository.findByNomeAndSobrenome(nome.toUpperCase(),
 				sobrenome.toUpperCase());
 		if (deletarCliente.isPresent()) {
 			clienteRepository.deleteById(deletarCliente.get().getId());

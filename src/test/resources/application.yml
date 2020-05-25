@@ -2,7 +2,7 @@
 spring:
   datasource:
     initialization-mode: never 
-    url:  ${JDBC_DATASOURCE_URL}
+    url: ${JDBC_DATASOURCE_URL}
     username: postgres
     password: 124578
   jpa:

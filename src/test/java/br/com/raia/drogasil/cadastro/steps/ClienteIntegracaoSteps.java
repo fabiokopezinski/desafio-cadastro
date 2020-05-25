@@ -17,7 +17,7 @@ import cucumber.api.java.pt.Dado;
 import cucumber.api.java.pt.Então;
 import cucumber.api.java.pt.Quando;
 
-public class ClienteControllerSteps extends FeatureBase {
+public class ClienteIntegracaoSteps extends FeatureBase {
 
 	@Autowired
 	private CidadeRepository cidadeRepository;
@@ -33,8 +33,6 @@ public class ClienteControllerSteps extends FeatureBase {
 
 	@Dado("que eu devo listar uma lista de clientes cadastrado")
 	public void listarClientes_DadoQueEuDevoListarUmaListaDeClientesCadastrado() {
-		this.clienteRepository.deleteAll();
-		this.cidadeRepository.deleteAll();
 		this.cidadeRepository.save(ScenarioFactory.RIO_GRANDE);
 		ScenarioFactory.BELTRANO.setCidade(ScenarioFactory.RIO_GRANDE);
 		this.clienteRepository.save(ScenarioFactory.BELTRANO);
@@ -74,8 +72,8 @@ public class ClienteControllerSteps extends FeatureBase {
 
 	@Então("cadastro um cliente")
 	public void cadastrar_EntaoCadastroUmCliente() {
-		assertEquals(entityCliente.getBody().getNome(), ScenarioFactory.CLIENTE_NOVO_FULANO.getNome());
-		assertEquals(entityCliente.getBody().getSobrenome(), ScenarioFactory.CLIENTE_NOVO_FULANO.getSobrenome());
+		assertEquals(entityCliente.getBody().getNome(), ScenarioFactory.CLIENTE_NOVO_FULANO.getNome().toUpperCase());
+		assertEquals(entityCliente.getBody().getSobrenome(), ScenarioFactory.CLIENTE_NOVO_FULANO.getSobrenome().toUpperCase());
 		assertEquals(entityCliente.getBody().getDataNascimento(),
 				ScenarioFactory.CLIENTE_NOVO_FULANO.getDataNascimento());
 		assertEquals(entityCliente.getBody().getCidade().getNome(),
@@ -93,10 +91,9 @@ public class ClienteControllerSteps extends FeatureBase {
 
 	@Dado("um cliente com nome e sobrenome")
 	public void buscarPorNomeCompleto_QuandoUmClienteComNomeESobrenome() {
-		this.clienteRepository.deleteAll();
-		this.cidadeRepository.deleteAll();
-		this.cidadeRepository.save(ScenarioFactory.CIDADE_ALEGRETE);
-		ScenarioFactory.FULANO.setCidade(ScenarioFactory.CIDADE_ALEGRETE);
+		
+		this.cidadeRepository.save(ScenarioFactory.CIDADE_VIAMAO);
+		ScenarioFactory.FULANO.setCidade(ScenarioFactory.CIDADE_VIAMAO);
 		this.clienteRepository.save(ScenarioFactory.FULANO);
 
 	}
