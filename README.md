@@ -31,6 +31,6 @@ Crie uma solução de backend para ser executada em nuvem que proveja as seguint
   + Jacoco
 
 # Executando o projeto
-  + [Heroku](https://aw-cadastros-api.herokuapp.com/swagger-ui/index.html?configUrl=/v3/api-docs/swagger-config)
+  + [OpenShift Online](http://desafio-cadastro-cadastros.apps.us-east-2.starter.openshift-online.com/swagger-ui/index.html?configUrl=/v3/api-docs/swagger-config)
   
 
