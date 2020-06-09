@@ -38,7 +38,7 @@ public class FeatureBase {
 	protected ResponseEntity<ClienteDTO> cadastrar(ClienteForm form) {
 
 		HttpHeaders headers = new HttpHeaders();
-		headers.add("Content-type", "application/json");
+		headers.add("Content-type", "application/json"); 
 		HttpEntity<ClienteForm> request = new HttpEntity<>(form, headers);
 		return template.postForEntity("http://localhost:" + randomServerPort + "/clientes", request, ClienteDTO.class);
 	}
@@ -78,7 +78,7 @@ public class FeatureBase {
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("Content-type", "application/json");
 		HttpEntity<String> body = new HttpEntity<>(cidade, headers);
-		return template.exchange("http://localhost:" + randomServerPort + "/cidades/nome?nome=" + cidade,
+		return template.exchange("http://localhost:" + randomServerPort + "/cidades/nomes?nome=" + cidade,
 				HttpMethod.GET, body, CidadeDTO.class);
 	}
 
@@ -87,7 +87,7 @@ public class FeatureBase {
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("Content-type", "application/json");
 		ResponseEntity<List<CidadeDTO>> exchange = template.exchange(
-				"http://localhost:" + randomServerPort + "/cidades/estado?estado=" + estado, HttpMethod.GET, null,
+				"http://localhost:" + randomServerPort + "/cidades/estados?estado=" + estado, HttpMethod.GET, null,
 				new ParameterizedTypeReference<List<CidadeDTO>>() {
 				});
 		return exchange;

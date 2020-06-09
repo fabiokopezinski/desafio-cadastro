@@ -1,6 +1,5 @@
 package br.com.raia.drogasil.cadastro.domain.form;
 
-import javax.persistence.PrePersist;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -22,9 +21,4 @@ public class ClienteAtualizarForm {
 	@NotBlank(message = "Informar um sobrenome")
 	private String sobrenome;
 	
-	@PrePersist
-	public void setar() {
-		this.setNome(nome.toUpperCase());
-		this.setSobrenome(sobrenome.toUpperCase());
-	}
 }

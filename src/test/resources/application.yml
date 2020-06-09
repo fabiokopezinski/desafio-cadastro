@@ -1,17 +1,13 @@
 ## PostgreSQL
 spring:
   datasource:
+    driverClassName: org.postgresql.Driver
     initialization-mode: never 
-    url: ${JDBC_DATASOURCE_URL}
+    url: jdbc:postgresql://localhost:5432/cadastros-testes
     username: postgres
     password: 124578
   jpa:
     hibernate:
      ddl-auto: create
+     database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: false
-
-### Swagger
-
-springdoc:
-  swagger-ui:
-    path: /swagger-ui.html

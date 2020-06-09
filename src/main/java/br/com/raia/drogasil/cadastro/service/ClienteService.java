@@ -105,14 +105,11 @@ public class ClienteService {
 
 	public String deletar(String nome, String sobrenome) {
 
-		Optional<Cliente> deletarCliente = clienteRepository.findByNomeAndSobrenome(nome.toUpperCase(),
-				sobrenome.toUpperCase());
-		if (deletarCliente.isPresent()) {
-			clienteRepository.deleteById(deletarCliente.get().getId());
-			return Constantes.DELETAR;
-		}
-		throw new ResourceNotFoundException(Constantes.NAO_FOI_ENCONTRADO);
-
+		Cliente deletarCliente = clienteRepository.findByNomeAndSobrenome(nome.toUpperCase(),
+				sobrenome.toUpperCase()).stream().findFirst().orElseThrow(()->new ResourceNotFoundException(Constantes.NAO_FOI_ENCONTRADO));
+		clienteRepository.deleteById(deletarCliente.getId());
+		return Constantes.DELETAR;
+		
 	}
 
 }

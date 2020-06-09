@@ -9,7 +9,9 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,7 +29,10 @@ import br.com.raia.drogasil.cadastro.scenario.ScenarioFactory;
 public class CidadeServiceTeste {
 
 	@MockBean
-	CidadeRepository cidadeRepository;
+	private CidadeRepository cidadeRepository;
+	
+	@Rule
+	public ExpectedException exceptionRule = ExpectedException.none();	
 
 	@Autowired
 	CidadeService cidadeService;
@@ -59,12 +64,12 @@ public class CidadeServiceTeste {
 	}
 
 	@Test
-	
-	public void buscarPorNome__DadoUmNomeDeUmaCidade_QuandoNaoAcharACidadeInformada_EntaoReceboResourceNotFoundException() throws Exception {
-		when(cidadeRepository.save(ScenarioFactory.CIDADE_PORTO_ALEGRE)).thenReturn(ScenarioFactory.CIDADE_PORTO_ALEGRE);
-		when(cidadeRepository.save(ScenarioFactory.CIDADE_PORTO_ALEGRE)).thenReturn(ScenarioFactory.CIDADE_VIAMAO);
-		assertThrows(ResourceNotFoundException.class, () -> cidadeService.buscarPorEstado(ScenarioFactory.PELOTAS));
-		verify(cidadeRepository).findByEstado(ScenarioFactory.PELOTAS);
+	public void buscarPorNome__DadoUmNomeDeUmaCidade_QuandoNaoAcharACidadeInformada_EntaoReceboResourceNotFoundException(){
+		
+		when(cidadeRepository.findByNome(ScenarioFactory.PELOTAS))
+		.thenThrow(new ResourceNotFoundException(ScenarioFactory.NAO_FOI_ENCONTRADO));
+		assertThrows(ResourceNotFoundException.class, () -> cidadeService.buscarPorCidade(ScenarioFactory.PELOTAS));
+		verify(cidadeRepository).findByNome(ScenarioFactory.PELOTAS);
 
 	}
 
@@ -84,18 +89,19 @@ public class CidadeServiceTeste {
 	}
 
 	@Test
-	
 	public void buscarPorEstado_QuandoNaoAcharOEstadoInformado_EntaoReceboResourceNotFoundException() throws Exception {
+		when(cidadeRepository.findByEstado(ScenarioFactory.SAO_PAULO))
+		.thenThrow(new ResourceNotFoundException(ScenarioFactory.NAO_FOI_ENCONTRADO));
 		assertThrows(ResourceNotFoundException.class, () -> cidadeService.buscarPorCidade(ScenarioFactory.SAO_PAULO));
 		verify(cidadeRepository).findByNome(ScenarioFactory.SAO_PAULO);
 	}
 
 	@Test
-	
 	public void deletar_DadoUmNomeDeUmaCidade_QuandoNaoAcharUmaCidadeQueFoiInformadaParaSerInformada_EntaoReceboResourceNotFoundException()
 			throws Exception {
-		assertThrows(ResourceNotFoundException.class,
-				() -> cidadeService.deletar(ScenarioFactory.CIDADE_VIAMAO.getNome()));
+		
+		when(cidadeRepository.findByNome(ScenarioFactory.CIDADE_VIAMAO.getNome())).thenThrow(new ResourceNotFoundException(ScenarioFactory.NAO_FOI_ENCONTRADO));
+		assertThrows(ResourceNotFoundException.class,() -> cidadeService.deletar(ScenarioFactory.CIDADE_VIAMAO.getNome()));
 
 	}
 

@@ -9,7 +9,7 @@ import cucumber.api.junit.Cucumber;
 @RunWith(Cucumber.class)
 @CucumberOptions(features = "src/test/resources/features/",glue ="br.com.raia.drogasil.cadastro.steps", plugin = {
 		"pretty", "html:target/report-html" },monochrome = true, snippets = SnippetType.CAMELCASE, dryRun = false)
-public class Runner {         
+public class Runner {          
   
 }
  

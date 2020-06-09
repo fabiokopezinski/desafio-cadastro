@@ -19,10 +19,10 @@ import br.com.raia.drogasil.cadastro.repository.CidadeRepository;
 public class CidadeService {
 
 	@Autowired
-	private Converter<Cidade,CidadeDTO> conversorCidade;
-	
+	private Converter<Cidade, CidadeDTO> conversorCidade;
+
 	@Autowired
-	private Converter<CidadeForm,Cidade> conversorCidadeForm;
+	private Converter<CidadeForm, Cidade> conversorCidadeForm;
 
 	@Autowired
 	private CidadeRepository cidadeRepository;
@@ -43,29 +43,28 @@ public class CidadeService {
 
 		return conversorCidade.toOutPut(cidadeRepository.findByNome(nome.toUpperCase())
 				.orElseThrow(() -> new ResourceNotFoundException(Constantes.NAO_FOI_ENCONTRADO)), CidadeDTO.class);
- 
+
 	}
 
 	public CidadeDTO cadastrar(CidadeForm cidade) {
-		
+
 		Optional<Cidade> cidadeNome = cidadeRepository.findByNome(cidade.getNome());
 		if (cidadeNome.isEmpty()) {
 
-			return conversorCidade.toOutPut(cidadeRepository.save(conversorCidadeForm.toEntity(cidade, Cidade.class)),CidadeDTO.class);
+			return conversorCidade.toOutPut(cidadeRepository.save(conversorCidadeForm.toEntity(cidade, Cidade.class)),
+					CidadeDTO.class);
 		}
 
-		throw new BusinessException(Constantes.JA_FOI_CADASTRO); 
+		throw new BusinessException(Constantes.JA_FOI_CADASTRO);
 
 	}
 
 	public String deletar(String nome) {
 
-		Optional<Cidade> deletarCidade = cidadeRepository.findByNome(nome.toUpperCase());
-		if (deletarCidade.isPresent()) {
-			cidadeRepository.deleteById(deletarCidade.get().getId()); 
-			return Constantes.DELETAR;
-		}
-		throw new ResourceNotFoundException(Constantes.NAO_FOI_ENCONTRADO);
+		Cidade cidade = cidadeRepository.findByNome(nome.toUpperCase()).stream().findFirst()
+				.orElseThrow(() -> new ResourceNotFoundException(Constantes.NAO_FOI_ENCONTRADO));
+		cidadeRepository.deleteById(cidade.getId());
+		return Constantes.DELETAR;
 
 	}
 

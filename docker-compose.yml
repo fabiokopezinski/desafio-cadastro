@@ -1,0 +1,47 @@
+version: '3.1'
+services:
+  db:
+      image: postgres
+      restart: always
+      environment:
+         POSTGRES_DB: cadastros
+         POSTGRES_USER: postgres
+         POSTGRES_PASSWORD: postgres
+      ports:
+        - 5434:5432
+      networks:
+        - redelocal
+
+  cadastro:
+
+        image: cadastro
+
+        restart: always
+
+        ports:
+           - 8082:8080
+
+        working_dir: /app
+
+        build:
+          context: .
+          dockerfile: Dockerfile
+
+        command: mvn spring-boot:run 
+
+        depends_on:
+          - db
+        networks:
+        - redelocal
+
+  adminer:
+        image: adminer
+        restart: always
+        ports:
+          - 8081:8080
+        networks:
+        - redelocal
+
+networks:
+   redelocal:
+        driver: bridge

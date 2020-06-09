@@ -63,7 +63,7 @@ public class ClienteController {
 	@Operation(summary = Constantes.BUSCAR_CLIENTES_PELO_NOME, description = Constantes.FAZ_UMA_BUSCA_POR_CLIENTES_PELO_MESMO_NOME)
 	@DocumentacaoSwaggerCliente
 	@ResponseStatus(code = HttpStatus.OK)
-	@GetMapping("/nome")
+	@GetMapping("/nomes")
 	public List<ClienteDTO> buscarPorNome(@RequestParam("nome") String nome) {
 		return clienteService.buscarPorNome(nome);
 	}

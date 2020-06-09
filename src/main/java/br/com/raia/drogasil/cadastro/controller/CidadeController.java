@@ -43,7 +43,7 @@ public class CidadeController {
 	@Operation(summary = Constantes.BUSCAR_POR_CIDADE, description = Constantes.BUSCA_POR_UMA_CIDADE_ESPECIFICA)
 	@DocumentacaoSwaggerCidade
 	@ResponseStatus(code = HttpStatus.OK)
-	@GetMapping("/nome")
+	@GetMapping("/nomes")
 	public CidadeDTO buscarPorCidade(@RequestParam("nome") String nome) {
 		return cidadeService.buscarPorCidade(nome);
 	}
@@ -51,7 +51,7 @@ public class CidadeController {
 	@Operation(summary = Constantes.BUSCAR_POR_ESTADO, description = Constantes.BUSCA_POR_UMA_ESTADO_ESPECIFICA)
 	@DocumentacaoSwaggerCidade
 	@ResponseStatus(code = HttpStatus.OK)
-	@GetMapping("/estado")
+	@GetMapping("/estados")
 	public List<CidadeDTO> buscarPorEstado(@RequestParam("estado") String estado) {
 
 		return cidadeService.buscarPorEstado(estado);
