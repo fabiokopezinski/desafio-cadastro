@@ -3,7 +3,7 @@ spring:
   datasource:
     driverClassName: org.postgresql.Driver
     initialization-mode: never 
-    url: jdbc:postgresql://localhost:5432/cadastros
+    url: jdbc:postgresql://postgresql:5432/cadastros
     username: postgres
     password: postgres
   jpa:
