@@ -19,10 +19,6 @@ Crie uma solução de backend para ser executada em nuvem que proveja as seguint
  
   + Cliente
   + Cidade
-
-
-# Porcentagem de cobertura de testes
-  ![](jacoco.png)
   
 # Ferramentas 
   +  Java
