@@ -17,10 +17,4 @@ Cenário: Deve cadastrar um cliente com sucesso
 				Então cadastro um cliente
 				Então recebo o status do cliente 201
 
-Cenário: Deve realizar uma busca por um cliente pelo nome completo 
-			
-				Dado um cliente com nome e sobrenome
-				Quando realizar a busca
-				Então eu recebo as informações desse cliente
-				Então recebo o status do cliente 200
 				

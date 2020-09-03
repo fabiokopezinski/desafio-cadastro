@@ -1,6 +1,7 @@
 package br.com.raia.drogasil.cadastro.scenario;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -62,19 +63,33 @@ public class ScenarioFactory {
 	public static final ClienteDTO BELTRANO_DTO=clienteBELTRANODTO();
 	public static final Optional<Cliente> CLIENTE_OPTIONAL=clienteOp();
 	public static final Optional<List<Cliente>>CLIENTE_OPTIONAL_LIST=clienteList();
-
+	public static final List<Cliente> CLIENTE_LIST=loadClienteList();
 	
 	public static final String DELETAR = "Deletada com sucesso";
 	public static final String NAO_FOI_ENCONTRADO = "Não foi encontrado";
 
+	public static final List<Cidade> LISTA_CIDADES=loadListCidade();
 	
 
 	private static Cidade cidade() {
 
 		portoAlegre = new Cidade();
+		portoAlegre.setId(1);
 		portoAlegre.setNome("PORTO ALEGRE");
 		portoAlegre.setEstado("RIO GRANDE DO SUL");
 		return portoAlegre;
+	}
+
+	private static List<Cliente> loadClienteList() {
+		List<Cliente>lista=new ArrayList<Cliente>();
+		lista.add(FABIO);
+		return lista;
+	}
+
+	private static List<Cidade> loadListCidade() {
+		List<Cidade> cidades=new ArrayList<Cidade>();
+		cidades.add(CIDADE_PORTO_ALEGRE);
+		return cidades;
 	}
 
 	private static ClienteDTO clienteNovoFulanoDTO() {
@@ -175,6 +190,7 @@ public class ScenarioFactory {
 
 	private static Cidade cidadeTres() {
 		Cidade viamao = new Cidade();
+		viamao.setId(2);
 		viamao.setNome("viamao");
 		viamao.setEstado("rio grande do sul");
 		return viamao;
@@ -228,7 +244,7 @@ public class ScenarioFactory {
 	}
 
 	private static ClienteAtualizarForm atualizarFulano() {
-		ClienteAtualizarForm atualizar = new ClienteAtualizarForm(null, null, null);
+		ClienteAtualizarForm atualizar = new ClienteAtualizarForm(1, "FABIO", "CARVALHOC");
 		return atualizar;
 	}
 
@@ -276,6 +292,7 @@ public class ScenarioFactory {
 
 		LocalDate dataNascimento = LocalDate.of(1993, 10, 21);
 		Cliente cliente = new Cliente();
+		cliente.setId(1);
 		cliente.setNome("fabio");
 		cliente.setSobrenome("kopezinski");
 		cliente.setSexo(SexoEnum.MASCULINO);
@@ -288,6 +305,7 @@ public class ScenarioFactory {
 	private static Cliente clienteDois() {
 		LocalDate dataNascimento = LocalDate.of(1993, 10, 21);
 		Cliente cliente = new Cliente();
+		cliente.setId(1);
 		cliente.setNome("FABIO");
 		cliente.setSobrenome("CARVALHO");
 		cliente.setSexo(SexoEnum.MASCULINO);
