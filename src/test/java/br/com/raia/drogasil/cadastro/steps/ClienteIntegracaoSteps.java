@@ -98,10 +98,6 @@ public class ClienteIntegracaoSteps extends FeatureBase {
 
 	}
 
-	@Quando("realizar a busca")
-	public void buscarPorNomeCompleto_QuandoRealizarABusca() {
-		entityCliente = buscarPorNomeCompleto(ScenarioFactory.FULANO.getNome(), ScenarioFactory.FULANO.getSobrenome());
-	}
 
 	@Então("eu recebo as informações desse cliente")
 	public void buscarPorNomeCompleto_EntaoEuReceboAsInformaçõesDesseCliente() {
